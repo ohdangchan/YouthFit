@@ -103,6 +103,52 @@ function toggleHotPolicies() {
   }
 }
 
+/**
+ * Theme Management (Light: Fintech Civic <-> Dark: Kinetic Glass AI)
+ */
+function initTheme() {
+  const savedTheme = localStorage.getItem('youthfit_theme');
+  const isDark = savedTheme === 'dark';
+  applyTheme(isDark);
+}
+
+function applyTheme(isDark) {
+  if (isDark) {
+    document.documentElement.classList.add('dark');
+    document.body && document.body.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+    document.body && document.body.classList.remove('dark');
+  }
+
+  // Update theme icons and labels
+  document.querySelectorAll('.theme-icon').forEach(icon => {
+    icon.textContent = isDark ? 'light_mode' : 'dark_mode';
+  });
+  document.querySelectorAll('#theme-toggle-label, .theme-toggle-label').forEach(label => {
+    label.textContent = isDark ? '라이트 모드' : '다크 모드';
+  });
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.classList.contains('dark');
+  const nextDark = !isDark;
+  applyTheme(nextDark);
+  localStorage.setItem('youthfit_theme', nextDark ? 'dark' : 'light');
+  
+  const msg = nextDark ? '다크 모드 (Kinetic Glass AI)로 전환되었습니다.' : '라이트 모드 (Fintech Civic)로 전환되었습니다.';
+  showToast(msg, 'info');
+}
+
+// Initialize theme immediately
+initTheme();
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+});
+
 window.showToast = showToast;
 window.toggleHotPolicies = toggleHotPolicies;
+window.initTheme = initTheme;
+window.toggleTheme = toggleTheme;
+
 

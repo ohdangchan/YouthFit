@@ -91,6 +91,218 @@
   --radius-full: 9999px;
 }
 
+/* ==============================================================================
+   Dark Theme (Kinetic Glass AI - stitch_ui_dark/stitch_ui/kinetic_glass_ai/DESIGN.md)
+   ============================================================================== */
+html.dark, body.dark {
+  /* Surface & Background Hierarchy */
+  --surface: #0b1326;
+  --surface-dim: #0b1326;
+  --surface-bright: #31394d;
+  --surface-container-lowest: #0b1426;
+  --surface-container-low: #121c32;
+  --surface-container: #16223c;
+  --surface-container-high: #1c2b4b;
+  --surface-container-highest: #233458;
+
+  /* On-Surface Typography & Icons */
+  --on-surface: #dae2fd;
+  --on-surface-variant: #a0aec0;
+  --inverse-surface: #dae2fd;
+  --inverse-on-surface: #283044;
+
+  /* Softened Borders & Outlines for Maximum Eye Comfort (연하고 눈이 편안한 엣지 테두리) */
+  --outline: rgba(148, 163, 184, 0.16);
+  --outline-variant: rgba(148, 163, 184, 0.06);
+  --hairline-border: rgba(255, 255, 255, 0.05);
+  --hairline-hover: rgba(76, 215, 246, 0.18);
+
+  /* Primary: Cyber Cyan */
+  --primary: #4cd7f6;
+  --primary-hover: #06b6d4;
+  --on-primary: #003640;
+  --primary-container: #06b6d4;
+  --on-primary-container: #00424f;
+  --primary-fixed: #acedff;
+  --primary-fixed-dim: #4cd7f6;
+  --on-primary-fixed: #001f26;
+  --on-primary-fixed-variant: #004e5c;
+
+  /* Secondary: Kinetic Emerald */
+  --secondary: #45dfa4;
+  --secondary-hover: #34d399;
+  --on-secondary: #003825;
+  --secondary-container: #00bd85;
+  --on-secondary-container: #00452e;
+  --secondary-fixed: #68fcbf;
+  --secondary-fixed-dim: #45dfa4;
+  --on-secondary-fixed: #002114;
+
+  /* Tertiary / Accents */
+  --tertiary: #ffb873;
+  --tertiary-container: #e89337;
+  --on-tertiary-container: #5b3200;
+  --tertiary-fixed: #ffdcbf;
+
+  /* Status & Alerts */
+  --error: #ffb4ab;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+  --warning: #ffb873;
+  --warning-container: #5b3200;
+
+  /* Elevations & Glows - Softened for Comfort */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 10px -1px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 24px -5px rgba(0, 0, 0, 0.6);
+  --shadow-hover: 0 0 16px -2px rgba(6, 182, 212, 0.18);
+  --shadow-primary: 0 0 16px -2px rgba(6, 182, 212, 0.22);
+  --shadow-secondary: 0 0 16px -2px rgba(69, 223, 164, 0.22);
+}
+
+/* Border Utilities for Seamless Theme Integration */
+.border-hairline-border {
+  border-color: var(--hairline-border) !important;
+}
+
+.border-outline-variant {
+  border-color: var(--outline-variant) !important;
+}
+
+/* Dark mode eye-comfort overrides: Gentle edges across all cards, modals & borders */
+html.dark .border-hairline-border,
+body.dark .border-hairline-border {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+html.dark header,
+body.dark header,
+html.dark aside,
+body.dark aside,
+html.dark footer,
+body.dark footer {
+  border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+html.dark .civic-card,
+body.dark .civic-card {
+  background-color: rgba(14, 23, 42, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+html.dark .civic-card:hover,
+body.dark .civic-card:hover {
+  border-color: rgba(76, 215, 246, 0.22);
+  box-shadow: var(--shadow-hover);
+}
+
+html.dark .civic-card-static,
+body.dark .civic-card-static {
+  background-color: rgba(14, 23, 42, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+html.dark .form-input,
+body.dark .form-input {
+  background-color: rgba(11, 19, 36, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--on-surface);
+}
+
+html.dark .form-input:focus,
+body.dark .form-input:focus {
+  border-color: rgba(76, 215, 246, 0.45);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.12);
+}
+
+/* ==============================================================================
+   Atmospheric Ambient Gradient Mesh System (Stitch UI Wireframe Style)
+   ============================================================================== */
+.ambient-gradient-canvas {
+  background-color: var(--surface);
+  background-image: 
+    radial-gradient(circle at 8% 12%, rgba(219, 234, 254, 0.75) 0%, transparent 45%),
+    radial-gradient(circle at 92% 85%, rgba(209, 250, 229, 0.70) 0%, transparent 48%),
+    radial-gradient(circle at 85% 15%, rgba(224, 231, 255, 0.50) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+html.dark .ambient-gradient-canvas,
+body.dark .ambient-gradient-canvas {
+  background-color: var(--surface);
+  background-image: 
+    radial-gradient(circle at 10% 12%, rgba(6, 182, 212, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 90% 88%, rgba(52, 211, 153, 0.07) 0%, transparent 50%),
+    radial-gradient(circle at 85% 15%, rgba(99, 102, 241, 0.05) 0%, transparent 45%);
+  background-attachment: fixed;
+}
+
+/* Hero Section Ambient Glow */
+.hero-gradient-mesh {
+  position: relative;
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(219, 234, 254, 0.85) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(209, 250, 229, 0.75) 0%, transparent 50%),
+    linear-gradient(180deg, var(--surface-container-low) 0%, var(--surface) 100%);
+}
+
+html.dark .hero-gradient-mesh {
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(52, 211, 153, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, var(--surface-container-low) 0%, var(--surface) 100%);
+}
+
+/* Auth Page Ambient Glow & Editorial Panel */
+.auth-ambient-mesh {
+  min-height: 100vh;
+  background-color: var(--surface);
+  background-image: 
+    radial-gradient(circle at 5% 10%, rgba(219, 234, 254, 0.85) 0%, transparent 45%),
+    radial-gradient(circle at 95% 90%, rgba(209, 250, 229, 0.80) 0%, transparent 45%),
+    radial-gradient(circle at 90% 10%, rgba(224, 231, 255, 0.60) 0%, transparent 40%);
+}
+
+html.dark .auth-ambient-mesh {
+  background-color: var(--surface);
+  background-image: 
+    radial-gradient(circle at 5% 10%, rgba(6, 182, 212, 0.11) 0%, transparent 50%),
+    radial-gradient(circle at 95% 90%, rgba(52, 211, 153, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.06) 0%, transparent 45%);
+}
+
+.auth-editorial-gradient {
+  background: linear-gradient(145deg, var(--surface-container-low) 0%, var(--surface-container) 100%);
+}
+
+html.dark .auth-editorial-gradient {
+  background: linear-gradient(145deg, rgba(18, 28, 50, 0.75) 0%, rgba(14, 22, 38, 0.85) 100%);
+}
+
+/* Dashboard Hero Banner Gradient */
+.dashboard-banner-gradient {
+  background: linear-gradient(135deg, rgba(239, 244, 255, 0.95) 0%, rgba(230, 252, 243, 0.90) 100%);
+}
+
+html.dark .dashboard-banner-gradient {
+  background: linear-gradient(135deg, rgba(19, 27, 46, 0.90) 0%, rgba(14, 28, 38, 0.85) 100%);
+}
+
+/* Diagnosis Header Gradient */
+.diagnosis-banner-gradient {
+  background: linear-gradient(135deg, rgba(239, 244, 255, 0.80) 0%, rgba(230, 252, 243, 0.65) 100%);
+}
+
+html.dark .diagnosis-banner-gradient {
+  background: linear-gradient(135deg, rgba(18, 28, 50, 0.80) 0%, rgba(13, 29, 39, 0.70) 100%);
+}
+
+
+
 /* Base Resets & Global Layout */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -106,6 +318,7 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
   letter-spacing: -0.01em;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 body {
