@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>유스핏 AI - 1분 맞춤 문진 진단</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  
+  <!-- Tailwind CSS Engine & External Custom Stylesheet -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#f8f9ff",
+            "surface-dim": "#cbdbf5",
+            "surface-bright": "#f8f9ff",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#eff4ff",
+            "surface-container": "#e5eeff",
+            "surface-container-high": "#dce9ff",
+            "surface-container-highest": "#d3e4fe",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#434655",
+            "inverse-surface": "#213145",
+            "inverse-on-surface": "#eaf1ff",
+            "outline": "#737686",
+            "outline-variant": "#c3c6d7",
+            "primary": "#004ac6",
+            "primary-container": "#2563eb",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#eeefff",
+            "primary-fixed": "#dbe1ff",
+            "primary-fixed-dim": "#b4c5ff",
+            "secondary": "#006c4a",
+            "secondary-container": "#82f5c1",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#00714e",
+            "secondary-fixed": "#85f8c4",
+            "secondary-fixed-dim": "#68dba9",
+            "tertiary": "#006242",
+            "tertiary-container": "#007d55",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6"
+          },
+          spacing: {
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xl": "2.5rem",
+            "margin": "2rem",
+            "margin-mobile": "1rem",
+            "gutter": "1.5rem"
+          },
+          fontFamily: {
+            "body": ["Pretendard", "Plus Jakarta Sans", "sans-serif"],
+            "display": ["Plus Jakarta Sans", "Pretendard", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-surface font-body text-on-surface antialiased">
+  
+  <!-- Header Bar -->
+  <header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-hairline-border">
+    <div class="h-16 max-w-7xl mx-auto px-margin-mobile md:px-margin flex items-center justify-between">
+      <div class="flex items-center gap-space-sm">
+        <a class="flex items-center gap-2 text-on-surface hover:text-primary transition-colors font-display font-bold text-lg" href="index.html">
+          <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-on-primary shadow-sm">
+            <span class="material-symbols-outlined text-[18px]">verified</span>
+          </div>
+          <span>YouthFit AI</span>
+        </a>
+        <span class="hidden sm:inline-block text-outline font-light">|</span>
+        <span class="hidden sm:inline-block text-xs font-semibold text-primary bg-primary-fixed px-2 py-0.5 rounded-full">1분 맞춤 문진</span>
+      </div>
+
+      <div class="flex items-center gap-space-sm">
+        <a class="text-xs text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1" href="index.html">
+          <span class="material-symbols-outlined text-[16px]">home</span>
+          <span>홈으로</span>
+        </a>
+        <a class="text-xs font-semibold text-primary hover:underline" href="auth.html">로그인</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Survey Container -->
+  <main class="w-full pt-20 pb-16 min-h-screen bg-surface px-4 sm:px-6">
+    <div class="max-w-5xl mx-auto flex flex-col py-4">
+      
+      <!-- Top Title & Progress Bar -->
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+        <div class="flex flex-col max-w-2xl">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="px-2.5 py-1 rounded-full bg-surface-container-high text-primary text-xs font-bold">
+              청년 정책 핀테크 진단 엔진
+            </span>
+            <span class="px-2.5 py-1 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> 2025 서울시 청년정책 최신판
+            </span>
+          </div>
+          <h1 class="font-display text-2xl sm:text-3xl font-extrabold text-on-surface tracking-tight leading-tight">
+            서류 읽느라 놓친 청년 지원금, <span class="text-primary">1분 진단</span>으로 찾아드립니다
+          </h1>
+          <p class="text-sm text-on-surface-variant mt-2">
+            서울시 핵심 청년 정책 및 온통청년 DB 기준, 나의 자격 요건과 예상 수혜액을 즉시 판별합니다.
+          </p>
+        </div>
+
+        <div class="flex flex-col md:items-end bg-surface-container-lowest p-4 rounded-xl shadow-sm min-w-[240px] border border-hairline-border">
+          <div class="flex items-center justify-between w-full mb-2">
+            <span class="text-xs text-on-surface-variant font-semibold tracking-wider">진단 단계</span>
+            <span class="text-sm text-primary font-bold">Step 2 of 4 (50%)</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-surface-container overflow-hidden">
+            <div class="h-full bg-primary rounded-full transition-all duration-500 ease-out" style="width: 50%;"></div>
+          </div>
+          <span class="text-xs text-outline mt-2">소요 시간: 약 45초 남음</span>
+        </div>
+      </div>
+
+      <!-- Main Layout: Questions (8 cols) + Sticky Preview (4 cols) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Form Column -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+          
+          <!-- Question 1: 나이 입력 -->
+          <section class="p-6 rounded-xl bg-surface-container-lowest shadow-sm border border-hairline-border">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-surface-container-high text-primary text-xs flex items-center justify-center font-bold">01</span>
+                <h2 class="text-base sm:text-lg font-bold text-on-surface">만 나이를 입력해 주세요</h2>
+              </div>
+              <span class="text-xs text-outline">주민등록상 만 나이</span>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div class="relative flex-1">
+                <input class="w-full h-12 px-4 rounded-lg bg-surface-container-lowest text-on-surface font-display text-xl font-bold focus:outline-none focus:bg-surface-container-low transition-colors text-right pr-12 shadow-sm border border-hairline-border" id="age-input" max="39" min="19" placeholder="24" type="number" value="24">
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant font-medium pointer-events-none">세</span>
+              </div>
+              <div class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-low border border-hairline-border">
+                <span class="material-symbols-outlined text-secondary text-sm">verified</span>
+                <span class="text-xs text-on-surface-variant">서울시 청년 조례 기준: 만 19~39세 지원 대상</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Question 2: 거주지 선택 -->
+          <section class="p-6 rounded-xl bg-surface-container-lowest shadow-sm border border-hairline-border">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-surface-container-high text-primary text-xs flex items-center justify-center font-bold">02</span>
+                <h2 class="text-base sm:text-lg font-bold text-on-surface">현재 거주하는 지역구는 어디인가요?</h2>
+              </div>
+              <span class="text-xs text-secondary font-semibold">자치구 특화 혜택 연동</span>
+            </div>
+            <p class="text-xs text-on-surface-variant mb-4">구별 추가 지원금(청년수당 가점, 월세 지원 우선배정) 판별에 활용됩니다.</p>
+            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="district-selector">
+              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-primary-container text-on-primary shadow-sm font-semibold flex items-center justify-center gap-1" type="button">
+                <span class="material-symbols-outlined text-xs">check</span> 관악구
+              </button>
+              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" type="button">마포구</button>
+              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" type="button">강남구</button>
+              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" type="button">성동구</button>
+              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" type="button">영등포구</button>
+              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" type="button">기타 20개 구 ▾</button>
+            </div>
+          </section>
+
+          <!-- Question 3: 경제활동 상태 -->
+          <section class="p-6 rounded-xl bg-surface-container-lowest shadow-sm border border-hairline-border">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-full bg-surface-container-high text-primary text-xs flex items-center justify-center font-bold">03</span>
+                <h2 class="text-base sm:text-lg font-bold text-on-surface">현재 경제 활동 상태는 어떠한가요?</h2>
+              </div>
+              <span class="text-xs text-outline">단일 선택</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="job-status-group">
+              
+              <!-- Option 1: Active by default -->
+              <div class="p-4 rounded-xl bg-surface-container-high text-on-surface cursor-pointer shadow-sm flex items-start justify-between border border-primary" data-status="jobseeker">
+                <div class="flex items-start gap-3">
+                  <span class="material-symbols-outlined text-primary mt-0.5">person_search</span>
+                  <div>
+                    <p class="font-bold text-primary text-base">미취업 / 구직준비생</p>
+                    <p class="text-xs text-on-surface-variant mt-0.5">구직활동지원금 및 청년수당 대상</p>
+                  </div>
+                </div>
+                <span class="w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center">
+                  <span class="material-symbols-outlined text-xs">check</span>
+                </span>
+              </div>
+
+              <!-- Option 2 -->
+              <div class="p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low text-on-surface cursor-pointer transition-colors shadow-sm flex items-start justify-between border border-hairline-border" data-status="employed">
+                <div class="flex items-start gap-3">
+                  <span class="material-symbols-outlined text-outline mt-0.5">business_center</span>
+                  <div>
+                    <p class="font-semibold text-on-surface text-base">재직자 (중소·중견기업)</p>
+                    <p class="text-xs text-on-surface-variant mt-0.5">청년내일채움공제 및 복지포인트</p>
+                  </div>
+                </div>
+                <span class="w-5 h-5 rounded-full bg-surface-container-high"></span>
+              </div>
+
+              <!-- Option 3 -->
+              <div class="p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low text-on-surface cursor-pointer transition-colors shadow-sm flex items-start justify-between border border-hairline-border" data-status="freelancer">
+                <div class="flex items-start gap-3">
+                  <span class="material-symbols-outlined text-outline mt-0.5">schedule</span>
+                  <div>
+                    <p class="font-semibold text-on-surface text-base">단기 근로 / 프리랜서</p>
+                    <p class="text-xs text-on-surface-variant mt-0.5">주 30시간 미만 아르바이트 포함</p>
+                  </div>
+                </div>
+                <span class="w-5 h-5 rounded-full bg-surface-container-high"></span>
+              </div>
+
+              <!-- Option 4 -->
+              <div class="p-4 rounded-xl bg-surface-container-lowest hover:bg-surface-container-low text-on-surface cursor-pointer transition-colors shadow-sm flex items-start justify-between border border-hairline-border" data-status="student">
+                <div class="flex items-start gap-3">
+                  <span class="material-symbols-outlined text-outline mt-0.5">school</span>
+                  <div>
+                    <p class="font-semibold text-on-surface text-base">대학생 / 대학원생</p>
+                    <p class="text-xs text-on-surface-variant mt-0.5">재학생, 휴학생, 졸업예정자</p>
+                  </div>
+                </div>
+                <span class="w-5 h-5 rounded-full bg-surface-container-high"></span>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- Question 4 & 5: 가구 형태 및 소득 분위 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Question 4 -->
+            <section class="p-6 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between border border-hairline-border">
+              <div>
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="w-6 h-6 rounded-full bg-surface-container-high text-primary text-xs flex items-center justify-center font-bold">04</span>
+                  <h2 class="text-base font-bold text-on-surface">가구 형태</h2>
+                </div>
+                <p class="text-xs text-on-surface-variant mb-4">주거비 및 월세 바우처 핵심 요건</p>
+              </div>
+              <div class="grid grid-cols-2 gap-2" id="household-group">
+                <button class="p-3.5 rounded-lg bg-surface-container-high text-left flex flex-col justify-between gap-2 shadow-sm border border-primary" data-household="single" type="button">
+                  <span class="material-symbols-outlined text-primary">person</span>
+                  <div>
+                    <p class="text-xs sm:text-sm font-bold text-primary">1인 가구 (단독)</p>
+                    <p class="text-xs text-on-surface-variant">독립 거주 청년</p>
+                  </div>
+                </button>
+                <button class="p-3.5 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-left flex flex-col justify-between gap-2 transition-colors border border-hairline-border" data-household="family" type="button">
+                  <span class="material-symbols-outlined text-outline">groups</span>
+                  <div>
+                    <p class="text-xs sm:text-sm font-semibold text-on-surface">부모 동거 / 다인 가구</p>
+                    <p class="text-xs text-on-surface-variant">가구원 합산 산정</p>
+                  </div>
+                </button>
+              </div>
+            </section>
+
+            <!-- Question 5 -->
+            <section class="p-6 rounded-xl bg-surface-container-lowest shadow-sm flex flex-col justify-between border border-hairline-border">
+              <div>
+                <div class="flex items-center gap-2 mb-3">
+                  <span class="w-6 h-6 rounded-full bg-surface-container-high text-primary text-xs flex items-center justify-center font-bold">05</span>
+                  <h2 class="text-base font-bold text-on-surface">기준 중위소득 구간</h2>
+                </div>
+                <p class="text-xs text-on-surface-variant mb-4">본인 또는 가구원 건강보험료 기준</p>
+              </div>
+              <div class="grid grid-cols-2 gap-2" id="income-group">
+                <button class="p-3 rounded-lg bg-surface-container-high text-left shadow-sm border border-primary" data-income="income60" type="button">
+                  <p class="text-xs font-bold text-primary">중위 60% 이하</p>
+                  <p class="text-xs text-on-surface-variant">1인 약 140만원 미만</p>
+                </button>
+                <button class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-left transition-colors border border-hairline-border" data-income="income120" type="button">
+                  <p class="text-xs font-semibold text-on-surface">중위 120% 이하</p>
+                  <p class="text-xs text-on-surface-variant">1인 약 280만원 미만</p>
+                </button>
+                <button class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-left transition-colors border border-hairline-border" data-income="income150" type="button">
+                  <p class="text-xs font-semibold text-on-surface">중위 150% 이하</p>
+                  <p class="text-xs text-on-surface-variant">1인 약 350만원 미만</p>
+                </button>
+                <button class="p-3 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-left transition-colors border border-hairline-border" data-income="unknown" type="button">
+                  <p class="text-xs font-semibold text-on-surface">잘 모름 (AI 추산)</p>
+                  <p class="text-xs text-on-surface-variant">최근 소득으로 역산</p>
+                </button>
+              </div>
+            </section>
+
+          </div>
+
+        </div>
+
+        <!-- Right Sticky Summary Sidebar -->
+        <div class="lg:col-span-4 flex flex-col gap-6 sticky top-24">
+          
+          <div class="p-6 rounded-2xl bg-surface-container-lowest shadow-md flex flex-col gap-5 border border-hairline-border">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-medium text-on-surface-variant">현재 응답 기준 실시간 추산</span>
+              <span class="px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold flex items-center gap-1">
+                <span class="material-symbols-outlined text-xs">bolt</span> 실시간 계산중
+              </span>
+            </div>
+
+            <div>
+              <span class="text-xs text-outline font-medium">예상 매칭 수혜금 (연간 환산)</span>
+              <div class="flex items-baseline gap-1 mt-1">
+                <span class="font-display text-4xl font-extrabold text-secondary tracking-tight" id="estimate-amount">3,600,000</span>
+                <span class="text-lg font-bold text-secondary">원 + α</span>
+              </div>
+              <p class="text-xs text-on-surface-variant mt-1.5 leading-relaxed" id="estimate-subtext">
+                서울시 청년수당(월 50만원×6회) + 청년 월세 지원 대상 후보
+              </p>
+            </div>
+
+            <!-- Progress Bars for Policies -->
+            <div class="p-4 rounded-xl bg-surface-container-low flex flex-col gap-3 border border-hairline-border">
+              <div>
+                <div class="flex justify-between items-center text-xs font-medium text-on-surface mb-1">
+                  <span>서울시 청년수당 적합도</span>
+                  <span class="text-primary font-bold" id="text-youth-allowance">96% 매우 높음</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+                  <div class="h-full bg-primary rounded-full transition-all duration-300" id="bar-youth-allowance" style="width: 96%;"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between items-center text-xs font-medium text-on-surface mb-1">
+                  <span>청년 부동산 월세 특별지원</span>
+                  <span class="text-secondary font-bold" id="text-rent-support">88% 통과 예상</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-surface-container-highest overflow-hidden">
+                  <div class="h-full bg-secondary rounded-full transition-all duration-300" id="bar-rent-support" style="width: 88%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Call to Action -->
+            <button class="w-full py-4 px-6 rounded-xl bg-primary hover:bg-primary-container text-on-primary text-base font-bold transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer" id="start-diagnosis-btn" type="button">
+              <span>AI 매칭 및 지원금 진단하기</span>
+              <span class="material-symbols-outlined text-lg">arrow_forward</span>
+            </button>
+
+            <div class="flex items-start gap-2 pt-1 text-xs text-outline">
+              <span class="material-symbols-outlined text-base mt-0.5">lock</span>
+              <p class="leading-relaxed">
+                개인정보는 진단 목적으로만 일회성 계산에 활용되며, 서버에 영구 저장되지 않습니다.
+              </p>
+            </div>
+          </div>
+
+          <!-- Quick Tips Card -->
+          <div class="p-5 rounded-xl bg-surface-container-low shadow-sm flex items-center gap-4 border border-hairline-border">
+            <div class="w-10 h-10 rounded-full bg-surface-container-lowest text-primary flex items-center justify-center flex-shrink-0 shadow-sm border border-hairline-border">
+              <span class="material-symbols-outlined">lightbulb</span>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-on-surface">관악구 청년 꿀팁</p>
+              <p class="text-xs text-on-surface-variant mt-0.5">
+                관악 청년청 거점 무료 심리상담 바우처(10만원 상당)가 자동 추가 적용됩니다.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+  <script src="js/survey.js"></script>
+</body>
+</html>
