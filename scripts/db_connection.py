@@ -1,6 +1,5 @@
-import os
-import sys
 import json
+import os
 import sqlite3
 from urllib.parse import urlparse
 
@@ -16,7 +15,6 @@ except ImportError:
 
 try:
     import psycopg2
-    from psycopg2.extras import RealDictCursor
     PSYCOPG2_AVAILABLE = True
 except ImportError:
     PSYCOPG2_AVAILABLE = False
@@ -45,7 +43,7 @@ def get_database_url():
 
 def is_postgres():
     url = get_database_url()
-    return url.startswith("postgresql://") or url.startswith("postgres://")
+    return url.startswith(("postgresql://", "postgres://"))
 
 def get_connection(allow_sqlite_fallback=False):
     """

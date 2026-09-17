@@ -1,15 +1,17 @@
+import json
 import os
 import sys
-import json
+from contextlib import suppress
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import db_connection
+try:
+    from scripts import db_connection
+except (ImportError, ModuleNotFoundError):
+    import db_connection
 
 if sys.stdout.encoding != 'utf-8':
-    try:
+    with suppress(AttributeError, OSError):
         sys.stdout.reconfigure(encoding='utf-8')
-    except Exception:
-        pass
 
 print("="*65)
 print("📦 [1] 데이터베이스 상태 및 스키마 검증")
@@ -66,7 +68,7 @@ try:
     print(f"\n총 레코드 건수: {total_rows}건")
     conn.close()
 
-except Exception as e:
+except Exception as e:  # noqa: BLE001
     print(f"[!] 데이터베이스 검증 중 오류: {e}")
 
 print("\n" + "="*65)
@@ -94,7 +96,7 @@ if os.path.exists(json_path):
         print(f"• 연령         : 만 {sample.get('min_age')}세 ~ {sample.get('max_age')}세")
         print(f"• 주관기관     : {sample.get('supervising_inst')}")
         print(f"• 지원내용     : {(sample.get('support_content') or '')[:90]}...")
-        print(f"• 파싱된 서류 목록 (체크리스트용 배열):")
+        print("• 파싱된 서류 목록 (체크리스트용 배열):")
         for doc in sample.get('required_docs_parsed', []):
             print(f"   ☑ {doc}")
 else:

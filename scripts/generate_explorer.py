@@ -1,12 +1,11 @@
+import json
 import os
 import sys
-import json
+from contextlib import suppress
 
 if sys.stdout.encoding != 'utf-8':
-    try:
+    with suppress(AttributeError, OSError):
         sys.stdout.reconfigure(encoding='utf-8')
-    except Exception:
-        pass
 
 JSON_PATH = "data/youth_policies_19_34.json"
 HTML_OUTPUT = "data/policies_explorer.html"
@@ -20,7 +19,6 @@ def generate_html_explorer():
         data = json.load(f)
 
     policies = data.get("policies", [])
-    meta = data.get("metadata", {})
 
     # HTML 템플릿
     html = f"""<!DOCTYPE html>

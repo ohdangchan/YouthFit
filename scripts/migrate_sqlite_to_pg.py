@@ -1,19 +1,21 @@
-import os
-import sys
-import json
-import sqlite3
 import argparse
+import json
+import os
+import sqlite3
+import sys
 import time
+from contextlib import suppress
 
 # UTF-8 출력 보정
 if sys.stdout.encoding != 'utf-8':
-    try:
+    with suppress(AttributeError, OSError):
         sys.stdout.reconfigure(encoding='utf-8')
-    except Exception:
-        pass
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import db_connection
+try:
+    from scripts import db_connection
+except (ImportError, ModuleNotFoundError):
+    import db_connection
 
 JSON_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "youth_policies_19_34.json")
 SQLITE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "youthfit.db")
@@ -80,7 +82,7 @@ def migrate_from_sqlite(conn, dry_run=False):
         raw_json_val = item.get("raw_json")
         try:
             raw_obj = json.loads(raw_json_val) if raw_json_val else item
-        except Exception:
+        except (json.JSONDecodeError, TypeError):
             raw_obj = item
             
         db_connection.upsert_policy(cur, item, raw_obj, db_type="postgresql")
@@ -128,7 +130,7 @@ def main():
             migrate_from_sqlite(conn, dry_run=False)
             
         conn.close()
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         print(f"\n[!] 마이그레이션 중 오류 발생: {e}")
         sys.exit(1)
 

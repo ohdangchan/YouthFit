@@ -1,9 +1,11 @@
+import json
 import os
 import sys
-import json
-import time
+from contextlib import suppress
+
 import requests
 import urllib3
+
 try:
     from dotenv import load_dotenv
     env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
@@ -15,10 +17,8 @@ except ImportError:
     pass
 
 if sys.stdout.encoding != 'utf-8':
-    try:
+    with suppress(AttributeError, OSError):
         sys.stdout.reconfigure(encoding='utf-8')
-    except Exception:
-        pass
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
