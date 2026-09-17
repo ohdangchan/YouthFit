@@ -3,15 +3,20 @@ import os
 import sys
 from contextlib import suppress
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
+for p in [CURRENT_DIR, PROJECT_ROOT]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 try:
     from scripts import db_connection
 except (ImportError, ModuleNotFoundError):
     import db_connection
 
-if sys.stdout.encoding != 'utf-8':
+if hasattr(sys.stdout, "reconfigure"):
     with suppress(AttributeError, OSError):
-        sys.stdout.reconfigure(encoding='utf-8')
+        getattr(sys.stdout, "reconfigure")(encoding="utf-8")
 
 print("="*65)
 print("📦 [1] 데이터베이스 상태 및 스키마 검증")
@@ -64,7 +69,8 @@ try:
             print(" [!] 'policies' 테이블이 존재하지 않습니다.")
 
     cur.execute("SELECT COUNT(*) FROM policies")
-    total_rows = cur.fetchone()[0]
+    row_count = cur.fetchone()
+    total_rows = row_count[0] if row_count else 0
     print(f"\n총 레코드 건수: {total_rows}건")
     conn.close()
 
@@ -78,7 +84,7 @@ print("="*65)
 json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "youth_policies_19_34.json")
 
 if os.path.exists(json_path):
-    with open(json_path, "r", encoding="utf-8") as f:
+    with open(json_path, encoding="utf-8") as f:
         jdata = json.load(f)
 
     meta = jdata.get("metadata", {})

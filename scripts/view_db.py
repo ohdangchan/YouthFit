@@ -3,15 +3,20 @@ import os
 import sys
 from contextlib import suppress
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
+for p in [CURRENT_DIR, PROJECT_ROOT]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 try:
     from scripts import db_connection
 except (ImportError, ModuleNotFoundError):
     import db_connection
 
-if sys.stdout.encoding != 'utf-8':
+if hasattr(sys.stdout, "reconfigure"):
     with suppress(AttributeError, OSError):
-        sys.stdout.reconfigure(encoding='utf-8')
+        getattr(sys.stdout, "reconfigure")(encoding="utf-8")
 
 def get_db_and_type():
     try:
@@ -31,18 +36,19 @@ def show_summary():
     cur = conn.cursor()
     try:
         cur.execute("SELECT COUNT(*) FROM policies")
-        total = cur.fetchone()[0]
-        
+        row_cnt = cur.fetchone()
+        total = row_cnt[0] if row_cnt else 0
+
         print("\n" + "="*65)
         print(f"📊 [YouthFit DB] 정책 데이터 요약 보고서 (엔진: {db_type.upper()}, 총 {total}건)")
         print("="*65)
-        
+
         print("\n[1] 분야(대분류)별 정책 통계")
         print("-" * 45)
         cur.execute("""
-            SELECT category_large, COUNT(*) as cnt 
-            FROM policies 
-            GROUP BY category_large 
+            SELECT category_large, COUNT(*) as cnt
+            FROM policies
+            GROUP BY category_large
             ORDER BY cnt DESC
         """)
         for cat, cnt in cur.fetchall():
@@ -50,22 +56,23 @@ def show_summary():
             bar = "█" * int(ratio / 4)
             cat_name = cat if cat else "미분류"
             print(f" • {cat_name:<16} : {cnt:>3}건 ({ratio:>5.1f}%) {bar}")
-            
+
         print("\n[2] 연령대별 수혜 커버리지")
         print("-" * 45)
         for age in [19, 24, 29, 34, 39]:
             q = format_query("SELECT COUNT(*) FROM policies WHERE min_age <= ? AND max_age >= ?", db_type)
             cur.execute(q, (age, age))
-            count = cur.fetchone()[0]
+            age_row = cur.fetchone()
+            count = age_row[0] if age_row else 0
             print(f" • 만 {age}세 대상 정책 : {count}건")
-            
+
         print("\n[3] 주요 4대 분야별 대표 정책 샘플")
         print("-" * 65)
         key_categories = ["주거", "일자리", "금융･복지･문화", "교육･직업훈련"]
         for cat in key_categories:
             q = format_query("""
                 SELECT policy_id, name, min_age, max_age, supervising_inst, support_content, required_docs, apply_url
-                FROM policies 
+                FROM policies
                 WHERE category_large = ?
                 ORDER BY RANDOM() LIMIT 1
             """, db_type)
@@ -82,7 +89,7 @@ def show_summary():
                 clean_docs = (docs or "").replace('\n', ' ')[:70]
                 print(f"   • 필수 서류  : {clean_docs}...")
                 print(f"   • 신청 링크  : {url if url else '별도 공고 참조'}")
-                
+
         print("\n" + "="*65 + "\n")
     finally:
         with suppress(Exception):
@@ -96,26 +103,26 @@ def search_policies(keyword=None, category=None, age=None, limit=10):
     try:
         query = "SELECT policy_id, name, category_large, min_age, max_age, supervising_inst, apply_url FROM policies WHERE 1=1"
         params = []
-        
+
         if keyword:
             query += " AND (name LIKE ? OR support_content LIKE ? OR explanation LIKE ?)"
             term = f"%{keyword}%"
             params.extend([term, term, term])
-            
+
         if category:
             query += " AND category_large LIKE ?"
             params.append(f"%{category}%")
-            
+
         if age is not None:
             query += " AND min_age <= ? AND max_age >= ?"
             params.extend([age, age])
-            
+
         query += " ORDER BY policy_id DESC LIMIT ?"
         params.append(limit)
-        
+
         cur.execute(format_query(query, db_type), params)
         rows = cur.fetchall()
-        
+
         print(f"\n🔍 검색 결과 (엔진: {db_type.upper()} | 조건: 키워드='{keyword or '-'}', 카테고리='{category or '-'}', 연령='{age or '-'}' / 상위 {len(rows)}건)")
         print("-" * 80)
         for i, row in enumerate(rows, 1):
@@ -140,10 +147,10 @@ def view_detail(policy_id):
         if not row:
             print(f"[!] 정책 ID '{policy_id}'를 찾을 수 없습니다.")
             return
-            
+
         col_names = [description[0] for description in cur.description]
-        item = dict(zip(col_names, row))
-        
+        item = dict(zip(col_names, row, strict=False))
+
         print("\n" + "="*70)
         print(f"📋 [정책 상세 정보] {item['name']} (엔진: {db_type.upper()})")
         print("="*70)
@@ -184,7 +191,8 @@ def view_crawled_policies(limit=20):
         rows = cur.fetchall()
 
         cur.execute(format_query("SELECT COUNT(*) FROM policies WHERE policy_id LIKE ?", db_type), ("crawl_%",))
-        crawled_total = cur.fetchone()[0]
+        c_row = cur.fetchone()
+        crawled_total = c_row[0] if c_row else 0
 
         print("\n" + "=" * 75)
         print(f"🌐 [YouthFit 크롤링 전용] 청년온통 제외 지자체/특화기관 수집 정책 (총 {crawled_total}건 중 최근 {len(rows)}건)")
@@ -211,9 +219,9 @@ if __name__ == "__main__":
     parser.add_argument("--age", type=int, help="만 나이 필터 (예: 24)")
     parser.add_argument("--detail", type=str, help="정책 ID 상세 보기")
     parser.add_argument("--limit", type=int, default=10, help="출력 건수 제한 (기본: 10)")
-    
+
     args = parser.parse_args()
-    
+
     if args.detail:
         view_detail(args.detail)
     elif args.crawled:

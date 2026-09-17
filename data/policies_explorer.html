@@ -201,7 +201,7 @@
         <div class="badge">온통청년 LIVE DB 연동 완료</div>
         <h1>🏛️ YouthFit 정책 데이터베이스 탐색기</h1>
         <p style="color: var(--text-sub);">온통청년 Open API를 통해 로컬 DB로 적재된 만 19세~34세 청년 수혜 정책 실시간 뷰어</p>
-        
+
         <div class="stats-bar">
             <div class="stat-item">총 수혜 가능 정책: <strong>423건</strong></div>
             <div class="stat-item">대상 연령: <strong>만 19세 ~ 34세</strong></div>
@@ -240,8 +240,8 @@
         items.forEach(p => {
             const card = document.createElement('div');
             card.className = 'card';
-            
-            const docsList = p.required_docs_parsed && p.required_docs_parsed.length > 0 
+
+            const docsList = p.required_docs_parsed && p.required_docs_parsed.length > 0
                 ? p.required_docs_parsed.slice(0, 3).map(d => '• ' + d).join('<br>')
                 : (p.required_docs ? p.required_docs.slice(0, 60) + '...' : '별도 서류 미기재');
 
@@ -271,7 +271,7 @@
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const filtered = policies.filter(p => {
             const matchCat = (activeCategory === 'ALL') || (p.category_large && p.category_large.includes(activeCategory));
-            const matchQuery = !query || 
+            const matchQuery = !query ||
                 (p.name && p.name.toLowerCase().includes(query)) ||
                 (p.support_content && p.support_content.toLowerCase().includes(query)) ||
                 (p.required_docs && p.required_docs.toLowerCase().includes(query)) ||

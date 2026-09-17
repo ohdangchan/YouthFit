@@ -32,13 +32,13 @@ def get_database_url():
     db_url = os.getenv("DATABASE_URL")
     if db_url:
         return db_url
-        
+
     host = os.getenv("POSTGRES_HOST", "localhost")
     port = os.getenv("POSTGRES_PORT", "5432")
     db = os.getenv("POSTGRES_DB", "youthfit")
     user = os.getenv("POSTGRES_USER", "postgres")
     password = os.getenv("POSTGRES_PASSWORD", "postgres")
-    
+
     return f"postgresql://{user}:{password}@{host}:{port}/{db}"
 
 def is_postgres():
@@ -51,7 +51,7 @@ def get_connection(allow_sqlite_fallback=False):
     기본적으로 PostgreSQL을 사용하며, 실패 시 allow_sqlite_fallback이 True면 SQLite로 대체합니다.
     """
     url = get_database_url()
-    
+
     if is_postgres():
         if not PSYCOPG2_AVAILABLE:
             raise RuntimeError(
@@ -96,9 +96,12 @@ def init_db(conn=None):
         close_conn = True
     else:
         db_type = "postgresql" if "psycopg2" in str(type(conn)) else "sqlite"
-        
+
+    if conn is None:
+        raise ConnectionError("데이터베이스에 연결할 수 없습니다.")
+
     cur = conn.cursor()
-    
+
     if db_type == "postgresql":
         # PostgreSQL DDL
         cur.execute("""
@@ -126,13 +129,13 @@ def init_db(conn=None):
             created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
         );
         """)
-        
+
         # PostgreSQL Indexes
         cur.execute("CREATE INDEX IF NOT EXISTS idx_policies_age ON policies(min_age, max_age);")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_policies_category ON policies(category_large, category_mid);")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_policies_name ON policies(name);")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_policies_raw_json ON policies USING gin(raw_json);")
-        
+
         conn.commit()
     else:
         # SQLite DDL
@@ -165,10 +168,10 @@ def init_db(conn=None):
         cur.execute("CREATE INDEX IF NOT EXISTS idx_category ON policies(category_large, category_mid);")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_name ON policies(name);")
         conn.commit()
-        
+
     if close_conn:
         conn.close()
-        
+
     return conn, db_type
 
 def upsert_policy(cur, norm, raw, db_type="postgresql"):
@@ -176,7 +179,7 @@ def upsert_policy(cur, norm, raw, db_type="postgresql"):
     정책 데이터를 INSERT 또는 UPDATE (UPSERT) 합니다.
     """
     raw_json_str = json.dumps(raw, ensure_ascii=False)
-    
+
     if db_type == "postgresql":
         query = """
         INSERT INTO policies (

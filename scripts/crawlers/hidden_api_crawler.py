@@ -1,13 +1,26 @@
+import os
 import re
+import sys
 from typing import Any, ClassVar
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
+# 패키지 및 모듈 탐색 경로 확보
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPTS_DIR = os.path.dirname(CURRENT_DIR)
+PROJECT_ROOT = os.path.dirname(SCRIPTS_DIR)
+for p in [CURRENT_DIR, SCRIPTS_DIR, PROJECT_ROOT]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 try:
-    from .base_crawler import BaseCrawler
+    from scripts.crawlers.base_crawler import BaseCrawler
 except (ImportError, ModuleNotFoundError):
-    from base_crawler import BaseCrawler
+    try:
+        from crawlers.base_crawler import BaseCrawler
+    except (ImportError, ModuleNotFoundError):
+        from base_crawler import BaseCrawler
 
 
 class SeoulYouthCrawler(BaseCrawler):
@@ -73,15 +86,17 @@ class SeoulYouthCrawler(BaseCrawler):
                     b_res = self.session.get(bbs_url, verify=False, timeout=15)
                     if b_res.status_code == 200:
                         b_soup = BeautifulSoup(b_res.text, "html.parser")
-                        for a in b_soup.find_all("a", href=lambda h: h and "pstSn=" in h):
+                        for a in b_soup.find_all("a"):
                             if len(results) >= limit:
                                 break
-                            b_href = a.get("href", "")
+                            b_href: str = self.get_tag_attr(a, "href")
+                            if "pstSn=" not in b_href:
+                                continue
                             sn_match = re.search(r"pstSn=(\d+)", b_href)
                             if not sn_match:
                                 continue
-                            sn = sn_match.group(1)
-                            b_title = " ".join(a.get_text().split())
+                            sn: str = sn_match.group(1)
+                            b_title: str = " ".join(self.get_tag_text(a).split())
                             if len(b_title) < 4:
                                 continue
 
@@ -128,15 +143,16 @@ class SeoulYouthCrawler(BaseCrawler):
         return results
 
     def _extract_seoul_links(self, soup: BeautifulSoup, results: list, limit: int, source_label: str):
-        links = soup.find_all("a", href=lambda h: h and ("sprtInfo/view.do" in h or "sprtInfoId=" in h))
-        for a in links:
+        for a in soup.find_all("a"):
             if len(results) >= limit:
                 break
-            href = a.get("href", "")
+            href: str = self.get_tag_attr(a, "href")
+            if not ("sprtInfo/view.do" in href or "sprtInfoId=" in href):
+                continue
             id_match = re.search(r"sprtInfoId=(\d+)", href)
-            info_id = id_match.group(1) if id_match else f"seoul_{len(results)}"
+            info_id: str = id_match.group(1) if id_match else f"seoul_{len(results)}"
 
-            raw_text = " ".join(a.get_text().split())
+            raw_text: str = " ".join(self.get_tag_text(a).split())
             if len(raw_text) < 4:
                 continue
 

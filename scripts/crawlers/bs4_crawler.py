@@ -1,4 +1,6 @@
+import os
 import re
+import sys
 import time
 from typing import Any
 from urllib.parse import urljoin
@@ -6,10 +8,21 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
+# 패키지 및 모듈 탐색 경로 확보
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPTS_DIR = os.path.dirname(CURRENT_DIR)
+PROJECT_ROOT = os.path.dirname(SCRIPTS_DIR)
+for p in [CURRENT_DIR, SCRIPTS_DIR, PROJECT_ROOT]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 try:
-    from .base_crawler import BaseCrawler
+    from scripts.crawlers.base_crawler import BaseCrawler
 except (ImportError, ModuleNotFoundError):
-    from base_crawler import BaseCrawler
+    try:
+        from crawlers.base_crawler import BaseCrawler
+    except (ImportError, ModuleNotFoundError):
+        from base_crawler import BaseCrawler
 
 
 class BusanYouthCrawler(BaseCrawler):
@@ -43,25 +56,24 @@ class BusanYouthCrawler(BaseCrawler):
                         break
 
                     soup = BeautifulSoup(res.text, "html.parser")
-                    links = soup.find_all("a", href=lambda h: h and ("bizSid=" in h or "view.nm" in h))
-                    if not links:
-                        break
+                    page_items_found: int = 0
+                    seen_sids: set[str] = set()
 
-                    page_items_found = 0
-                    seen_sids = set()
-
-                    for a in links:
+                    for a in soup.find_all("a"):
                         if len(results) >= limit:
                             break
 
-                        href = a.get("href", "")
+                        href: str = self.get_tag_attr(a, "href")
+                        if not ("bizSid=" in href or "view.nm" in href):
+                            continue
+
                         match = re.search(r"bizSid=([A-Za-z0-9_]+)", href)
-                        sid = match.group(1) if match else f"busan_p{page}_{len(results)}"
+                        sid: str = match.group(1) if match else f"busan_p{page}_{len(results)}"
                         if sid in seen_sids:
                             continue
                         seen_sids.add(sid)
 
-                        raw_text = " ".join(a.get_text().split())
+                        raw_text: str = " ".join(self.get_tag_text(a).split())
                         if len(raw_text) < 5:
                             continue
 
@@ -169,23 +181,25 @@ class IncheonYouthCrawler(BaseCrawler):
             res = self.session.get(self.source_url, verify=False, timeout=15)
             if res.status_code == 200:
                 soup = BeautifulSoup(res.text, "html.parser")
-                links = soup.find_all("a", href=lambda h: h and "poly_seq=" in h)
-                seen_seqs = set()
+                seen_seqs: set[str] = set()
 
-                for a in links:
+                for a in soup.find_all("a"):
                     if len(results) >= limit:
                         break
 
-                    href = a.get("href", "")
+                    href: str = self.get_tag_attr(a, "href")
+                    if "poly_seq=" not in href:
+                        continue
+
                     seq_match = re.search(r"poly_seq=(\d+)", href)
                     if not seq_match:
                         continue
-                    seq = seq_match.group(1)
+                    seq: str = seq_match.group(1)
                     if seq in seen_seqs:
                         continue
                     seen_seqs.add(seq)
 
-                    title = " ".join(a.get_text().split())
+                    title: str = " ".join(self.get_tag_text(a).split())
                     if not title or len(title) < 4:
                         continue
 
@@ -246,13 +260,13 @@ class IncheonYouthCrawler(BaseCrawler):
                                 break
                             a_tag = tr.select_one("a[href*='msg_seq=']")
                             if not a_tag:
-                                continue
-                            n_title = " ".join(a_tag.get_text().split())
-                            n_href = a_tag.get("href", "")
+                                 continue
+                            n_title: str = " ".join(self.get_tag_text(a_tag).split())
+                            n_href: str = self.get_tag_attr(a_tag, "href")
                             m_match = re.search(r"msg_seq=(\d+)", n_href)
                             if not m_match or len(n_title) < 4:
-                                continue
-                            m_seq = m_match.group(1)
+                                 continue
+                            m_seq: str = m_match.group(1)
                             pol_id = f"crawl_incheon_msg_{bcd}_{m_seq}"
 
                             self.stats["total_fetched"] += 1
@@ -340,13 +354,13 @@ class ShHousingCrawler(BaseCrawler):
                     if not a_tag:
                         continue
 
-                    title = " ".join(a_tag.get_text().split())
-                    onclick = a_tag.get("onclick", "")
+                    title: str = " ".join(self.get_tag_text(a_tag).split())
+                    onclick: str = self.get_tag_attr(a_tag, "onclick")
                     seq_match = re.search(r"getDetailView\('(\d+)'\)", onclick)
-                    seq = seq_match.group(1) if seq_match else f"sh_p{page}_{len(results)}"
+                    seq: str = seq_match.group(1) if seq_match else f"sh_p{page}_{len(results)}"
 
                     tds = row.select("td")
-                    date_str = tds[-2].get_text(strip=True) if len(tds) >= 4 else "상시"
+                    date_str: str = self.get_tag_text(tds[-2]) if len(tds) >= 4 else "상시"
 
                     policy_id = f"crawl_sh_{seq}"
                     detail_url = f"https://www.i-sh.co.kr/main/lay2/program/S1T294C297/www/brd/m_247/detail.do?seq={seq}"
@@ -417,23 +431,24 @@ class DaeguYouthCrawler(BaseCrawler):
             res = self.session.get(self.source_url, verify=False, timeout=15)
             if res.status_code == 200:
                 soup = BeautifulSoup(res.text, "html.parser")
-                links = soup.find_all("a", href=lambda h: h and "menu_id=" in h)
-
-                seen_menus = set()
-                for a in links:
+                seen_menus: set[str] = set()
+                for a in soup.find_all("a"):
                     if len(results) >= limit:
                         break
 
-                    href = a.get("href", "")
+                    href: str = self.get_tag_attr(a, "href")
+                    if "menu_id=" not in href:
+                        continue
+
                     m_match = re.search(r"menu_id=(\d+)", href)
                     if not m_match:
                         continue
-                    menu_id = m_match.group(1)
+                    menu_id: str = m_match.group(1)
                     if menu_id in seen_menus:
                         continue
                     seen_menus.add(menu_id)
 
-                    title = " ".join(a.get_text().split())
+                    title: str = " ".join(self.get_tag_text(a).split())
                     if len(title) < 3 or title in ["대구청년정책", "바로가기", "홈"]:
                         continue
 
@@ -509,14 +524,12 @@ class GwangjuYouthCrawler(BaseCrawler):
             res = self.session.get(self.source_url, verify=False, timeout=15)
             if res.status_code == 200:
                 soup = BeautifulSoup(res.text, "html.parser")
-                links = soup.find_all("a", href=True)
-
-                seen_hrefs = set()
-                for a in links:
+                seen_hrefs: set[str] = set()
+                for a in soup.find_all("a"):
                     if len(results) >= limit:
                         break
-                    href = a.get("href", "")
-                    title = " ".join(a.get_text().split())
+                    href: str = self.get_tag_attr(a, "href")
+                    title: str = " ".join(self.get_tag_text(a).split())
                     if len(title) < 4 or href in seen_hrefs:
                         continue
                     if not any(k in href.lower() for k in ["policy", "pcy", "view", "bbs", "board", "detail"]):

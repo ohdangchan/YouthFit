@@ -6,7 +6,12 @@ from contextlib import suppress
 import requests
 import urllib3
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
+for p in [CURRENT_DIR, PROJECT_ROOT]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 try:
     from scripts import db_connection
 except (ImportError, ModuleNotFoundError):
@@ -22,11 +27,9 @@ try:
 except ImportError:
     pass
 
-if sys.stdout.encoding != 'utf-8':
-    try:
-        sys.stdout.reconfigure(encoding='utf-8')
-    except (AttributeError, OSError):
-        pass
+if hasattr(sys.stdout, "reconfigure"):
+    with suppress(AttributeError, OSError):
+        getattr(sys.stdout, "reconfigure")(encoding="utf-8")
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -53,17 +56,17 @@ def is_eligible_19_34(min_age_str, max_age_str, age_limit_yn):
     """
     if age_limit_yn == "N" or (not min_age_str and not max_age_str):
         return True
-        
+
     try:
         min_age = int(min_age_str) if min_age_str and min_age_str.isdigit() else 0
     except ValueError:
         min_age = 0
-        
+
     try:
         max_age = int(max_age_str) if max_age_str and max_age_str.isdigit() else 99
     except ValueError:
         max_age = 99
-        
+
     # 만 19세~34세와 겹치는지 확인:
     # 정책의 최소연령 <= 34 이고 최대연령 >= 19
     return min_age <= 34 and max_age >= 19
@@ -115,15 +118,19 @@ def fetch_and_store_policies(max_pages=10, page_size=100):
         return
 
     conn, db_type = init_db()
+    if conn is None:
+        print("[!] 데이터베이스 초기화 실패")
+        return
+
     cur = conn.cursor()
-    
+
     total_fetched = 0
     eligible_count = 0
     all_eligible_policies = []
-    
+
     print(f"[*] 온통청년 Open API 정책 수집 시작 (최대 {max_pages} 페이지, 페이지당 {page_size}건)...")
     print(f"[*] 연결된 데이터베이스 타입: [{db_type.upper()}]")
-    
+
     try:
         for page in range(1, max_pages + 1):
             params = {
@@ -132,47 +139,47 @@ def fetch_and_store_policies(max_pages=10, page_size=100):
                 "pageSize": page_size,
                 "rtnType": "json"
             }
-            
+
             try:
                 res = requests.get(BASE_URL, params=params, headers=HEADERS, verify=False, timeout=15)
                 if res.status_code != 200:
                     print(f"[!] 페이지 {page} 호출 실패: HTTP {res.status_code}")
                     break
-                    
+
                 data = res.json()
                 if data.get("resultCode") != 200:
                     print(f"[!] 페이지 {page} API 에러: {data.get('resultMessage')}")
                     break
-                    
+
                 policy_list = data.get("result", {}).get("youthPolicyList", [])
                 if not policy_list:
                     print(f"[*] 페이지 {page}: 더 이상 데이터가 없습니다.")
                     break
-                    
+
                 total_count = data.get("result", {}).get("pagging", {}).get("totCount", 0)
                 print(f"[*] 페이지 {page}/{max_pages} 수신 완료 ({len(policy_list)}건) - 전체 등록 정책: {total_count}건")
-                
+
                 for raw in policy_list:
                     total_fetched += 1
                     min_age = raw.get("sprtTrgtMinAge")
                     max_age = raw.get("sprtTrgtMaxAge")
                     age_limit_yn = raw.get("sprtTrgtAgeLmtYn")
-                    
+
                     # 만 19세~34세 대상 정책 필터링
                     if is_eligible_19_34(min_age, max_age, age_limit_yn):
                         norm = normalize_policy(raw)
                         eligible_count += 1
                         all_eligible_policies.append(norm)
-                        
+
                         # DB 저장 (PostgreSQL / SQLite 호환)
                         db_connection.upsert_policy(cur, norm, raw, db_type=db_type)
-                        
+
                 conn.commit()
-                
+
                 # 전체 정책 수에 도달하면 중단
                 if total_fetched >= total_count:
                     break
-                    
+
             except Exception as e:  # noqa: BLE001
                 print(f"[!] 페이지 {page} 처리 중 예외 발생: {e}")
                 break
@@ -181,7 +188,7 @@ def fetch_and_store_policies(max_pages=10, page_size=100):
             cur.close()
         with suppress(Exception):
             conn.close()
-    
+
     # JSON 파일로도 저장
     with open(JSON_OUTPUT_PATH, "w", encoding="utf-8") as f:
         json.dump({
@@ -194,7 +201,7 @@ def fetch_and_store_policies(max_pages=10, page_size=100):
             },
             "policies": all_eligible_policies
         }, f, ensure_ascii=False, indent=2)
-        
+
     print("\n" + "="*50)
     print("[*] 수집 및 DB 변환 완료!")
     print(f" - 온통청년 API 수신 총 정책: {total_fetched}건")

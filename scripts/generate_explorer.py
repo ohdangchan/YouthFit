@@ -3,19 +3,20 @@ import os
 import sys
 from contextlib import suppress
 
-if sys.stdout.encoding != 'utf-8':
+if hasattr(sys.stdout, "reconfigure"):
     with suppress(AttributeError, OSError):
-        sys.stdout.reconfigure(encoding='utf-8')
+        getattr(sys.stdout, "reconfigure")(encoding="utf-8")
 
-JSON_PATH = "data/youth_policies_19_34.json"
-HTML_OUTPUT = "data/policies_explorer.html"
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+JSON_PATH = os.path.join(PROJECT_ROOT, "data", "youth_policies_19_34.json")
+HTML_OUTPUT = os.path.join(PROJECT_ROOT, "data", "policies_explorer.html")
 
 def generate_html_explorer():
     if not os.path.exists(JSON_PATH):
         print(f"[!] JSON 파일이 없습니다: {JSON_PATH}")
         return
 
-    with open(JSON_PATH, "r", encoding="utf-8") as f:
+    with open(JSON_PATH, encoding="utf-8") as f:
         data = json.load(f)
 
     policies = data.get("policies", [])
@@ -224,7 +225,7 @@ def generate_html_explorer():
         <div class="badge">온통청년 LIVE DB 연동 완료</div>
         <h1>🏛️ YouthFit 정책 데이터베이스 탐색기</h1>
         <p style="color: var(--text-sub);">온통청년 Open API를 통해 로컬 DB로 적재된 만 19세~34세 청년 수혜 정책 실시간 뷰어</p>
-        
+
         <div class="stats-bar">
             <div class="stat-item">총 수혜 가능 정책: <strong>{len(policies)}건</strong></div>
             <div class="stat-item">대상 연령: <strong>만 19세 ~ 34세</strong></div>
@@ -263,8 +264,8 @@ def generate_html_explorer():
         items.forEach(p => {{
             const card = document.createElement('div');
             card.className = 'card';
-            
-            const docsList = p.required_docs_parsed && p.required_docs_parsed.length > 0 
+
+            const docsList = p.required_docs_parsed && p.required_docs_parsed.length > 0
                 ? p.required_docs_parsed.slice(0, 3).map(d => '• ' + d).join('<br>')
                 : (p.required_docs ? p.required_docs.slice(0, 60) + '...' : '별도 서류 미기재');
 
@@ -294,7 +295,7 @@ def generate_html_explorer():
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const filtered = policies.filter(p => {{
             const matchCat = (activeCategory === 'ALL') || (p.category_large && p.category_large.includes(activeCategory));
-            const matchQuery = !query || 
+            const matchQuery = !query ||
                 (p.name && p.name.toLowerCase().includes(query)) ||
                 (p.support_content && p.support_content.toLowerCase().includes(query)) ||
                 (p.required_docs && p.required_docs.toLowerCase().includes(query)) ||
@@ -320,7 +321,7 @@ def generate_html_explorer():
 
     with open(HTML_OUTPUT, "w", encoding="utf-8") as f:
         f.write(html)
-        
+
     print(f"[OK] 인터랙티브 정책 탐색기 웹페이지 생성 완료: {HTML_OUTPUT}")
 
 if __name__ == "__main__":

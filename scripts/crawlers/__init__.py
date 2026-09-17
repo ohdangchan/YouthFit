@@ -16,18 +16,38 @@ from .hidden_api_crawler import (
     HiddenApiCrawler,
     SeoulYouthCrawler,
 )
+from .nationwide_crawler import (
+    ChungnamYouthCrawler,
+    DaejeonYouthCrawler,
+    GangwonYouthCrawler,
+    GyeongnamYouthCrawler,
+    JejuYouthCrawler,
+    JeonbukYouthCrawler,
+    NationwideRegionalCrawler,
+    SejongYouthCrawler,
+    UlsanYouthCrawler,
+)
 from .playwright_crawler import PlaywrightCrawler
 
 __all__ = [
     "BaseCrawler",
     "Bs4Crawler",
     "BusanYouthCrawler",
+    "ChungnamYouthCrawler",
     "DaeguYouthCrawler",
+    "DaejeonYouthCrawler",
+    "GangwonYouthCrawler",
     "GwangjuYouthCrawler",
     "GyeonggiJobabaCrawler",
+    "GyeongnamYouthCrawler",
     "HiddenApiCrawler",
     "IncheonYouthCrawler",
+    "JejuYouthCrawler",
+    "JeonbukYouthCrawler",
+    "NationwideRegionalCrawler",
     "PlaywrightCrawler",
+    "SejongYouthCrawler",
     "SeoulYouthCrawler",
     "ShHousingCrawler",
+    "UlsanYouthCrawler",
 ]

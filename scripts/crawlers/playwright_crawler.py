@@ -1,17 +1,30 @@
+import os
+import sys
 import time
 from typing import Any
 from urllib.parse import urljoin
 
+# 패키지 및 모듈 탐색 경로 확보
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPTS_DIR = os.path.dirname(CURRENT_DIR)
+PROJECT_ROOT = os.path.dirname(SCRIPTS_DIR)
+for p in [CURRENT_DIR, SCRIPTS_DIR, PROJECT_ROOT]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 try:
-    from .base_crawler import BaseCrawler
+    from scripts.crawlers.base_crawler import BaseCrawler
 except (ImportError, ModuleNotFoundError):
-    from base_crawler import BaseCrawler
+    try:
+        from crawlers.base_crawler import BaseCrawler
+    except (ImportError, ModuleNotFoundError):
+        from base_crawler import BaseCrawler
 
 
 class PlaywrightCrawler(BaseCrawler):
     """
     전략 ②: 동적 웹페이지 크롤링 (Playwright)
-    
+
     K-Startup 창업마당, 청년창업사관학교 등 SPA 동적 렌더링 사이트를 헤드리스 브라우저로
     렌더링하여 청년 창업/스타트업 특화 지원사업을 수집합니다.
     """
@@ -60,7 +73,8 @@ class PlaywrightCrawler(BaseCrawler):
                             if not title or len(title) < 5 or "공고가 없습니다" in title:
                                 continue
 
-                            href = title_elem.get_attribute("href") if title_elem else ""
+                            raw_href = title_elem.get_attribute("href") if title_elem else ""
+                            href = str(raw_href or "")
                             full_url = urljoin(self.source_url, href) if href and not href.startswith("javascript") else self.source_url
 
                             desc_elem = card.query_selector(".desc, .txt, td:nth-child(3)")

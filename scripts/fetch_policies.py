@@ -16,9 +16,9 @@ try:
 except ImportError:
     pass
 
-if sys.stdout.encoding != 'utf-8':
+if hasattr(sys.stdout, "reconfigure"):
     with suppress(AttributeError, OSError):
-        sys.stdout.reconfigure(encoding='utf-8')
+        getattr(sys.stdout, "reconfigure")(encoding="utf-8")
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -34,23 +34,23 @@ def test_fetch_sample():
     if not API_KEY:
         print("[!] 오류: ONTONG_API_KEY가 설정되지 않았습니다. .env 파일에 ONTONG_API_KEY를 입력해주세요.")
         return
-        
+
     params = {
         "apiKeyNm": API_KEY,
         "pageNum": 1,
         "pageSize": 2,
         "rtnType": "json"
     }
-    
+
     res = requests.get(BASE_URL, params=params, headers=HEADERS, verify=False, timeout=10)
     data = res.json()
-    
+
     print("=== API Response Header Info ===")
     print("Result Code:", data.get("resultCode"))
     print("Result Message:", data.get("resultMessage"))
     paging = data.get("result", {}).get("pagging", {})
     print(f"Total Policy Count: {paging.get('totCount')}")
-    
+
     policies = data.get("result", {}).get("youthPolicyList", [])
     if policies:
         os.makedirs("data", exist_ok=True)

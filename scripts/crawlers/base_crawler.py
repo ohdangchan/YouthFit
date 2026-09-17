@@ -34,7 +34,7 @@ class BaseCrawler(ABC):
     모든 청년 정책 크롤러의 기본 추상 클래스.
     PostgreSQL 데이터베이스 연결 및 표준 정책 스키마로의 정규화, Upsert 저장 기능을 제공합니다.
     """
-    
+
     DEFAULT_HEADERS: ClassVar[dict[str, str]] = {
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -48,19 +48,20 @@ class BaseCrawler(ABC):
     }
 
     def __init__(self, name: str, source_url: str):
-        self.name = name
-        self.source_url = source_url
-        self.logger = logging.getLogger(f"Crawler:{name}")
-        self.conn = None
-        self.db_type = None
-        self.cur = None
-        
+        self.name: str = name
+        self.source_url: str = source_url
+        self.logger: logging.Logger = logging.getLogger(f"Crawler:{name}")
+        self.conn: Any = None
+        self.db_type: Any = None
+        self.cur: Any = None
+        self.session: requests.Session = self.create_session()
+
         # 사전 중복 방지 인메모리 세트 (DB 기존 적재 데이터 캐시)
         self.existing_ids: set[str] = set()
         self.existing_names: set[str] = set()
-        
+
         # 통계 카운터
-        self.stats = {
+        self.stats: dict[str, int] = {
             "total_fetched": 0,
             "saved_or_updated": 0,
             "skipped_duplicate": 0,
@@ -68,13 +69,36 @@ class BaseCrawler(ABC):
             "skipped_youthcenter": 0
         }
 
+    @staticmethod
+    def get_tag_text(elem: Any) -> str:
+        """BeautifulSoup 태그 또는 요소에서 안전하게 텍스트를 추출합니다."""
+        if elem is None:
+            return ""
+        if hasattr(elem, "get_text"):
+            return str(elem.get_text()).strip()
+        if hasattr(elem, "text"):
+            return str(elem.text).strip()
+        return str(elem).strip()
+
+    @staticmethod
+    def get_tag_attr(elem: Any, attr: str, default: str = "") -> str:
+        """BeautifulSoup 태그에서 속성값을 안전하게 문자열로 추출합니다."""
+        if elem is None:
+            return default
+        if hasattr(elem, "get"):
+            val = elem.get(attr, default)
+            if isinstance(val, (list, tuple)):
+                return str(val[0]) if val else default
+            return str(val or default)
+        return default
+
     def create_session(self) -> requests.Session:
         """
         네트워크 불안정 및 재시도를 처리하는 견고한 requests.Session 객체 생성
         """
         session = requests.Session()
         session.headers.update(self.DEFAULT_HEADERS)
-        
+
         retries = Retry(
             total=3,
             backoff_factor=0.5,
@@ -165,8 +189,9 @@ class BaseCrawler(ABC):
         try:
             if self.conn is None or self.cur is None:
                 self.conn, self.db_type = db_connection.get_connection(allow_sqlite_fallback=True)
-                self.cur = self.conn.cursor()
-                self.logger.info(f"[{self.name}] DB 연결 성공: {self.db_type.upper()}")
+                if self.conn is not None:
+                    self.cur = self.conn.cursor()
+                self.logger.info(f"[{self.name}] DB 연결 성공: {str(self.db_type).upper()}")
                 # 기존 적재 데이터 사전 캐싱
                 self.load_existing_policies()
         except Exception as e:
@@ -245,7 +270,7 @@ class BaseCrawler(ABC):
         정규화된 데이터를 PostgreSQL policies 테이블에 Upsert합니다.
         (ON CONFLICT (policy_id) DO UPDATE)
         """
-        if not self.cur:
+        if not self.cur or not self.conn:
             self.init_db()
 
         try:
@@ -255,7 +280,8 @@ class BaseCrawler(ABC):
                 raw=raw_data,
                 db_type=self.db_type
             )
-            self.conn.commit()
+            if self.conn:
+                self.conn.commit()
             self.stats["saved_or_updated"] += 1
             return True
         except Exception as e:  # noqa: BLE001
