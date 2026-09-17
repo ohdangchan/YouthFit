@@ -106,3 +106,331 @@ function toggleHotPolicies() {
 window.showToast = showToast;
 window.toggleHotPolicies = toggleHotPolicies;
 
+/**
+ * Global Auth Status Synchronization across all web pages
+ */
+function updateGlobalAuthHeader() {
+  try {
+    const raw = localStorage.getItem('youthfit_user');
+    if (!raw) return;
+    const user = JSON.parse(raw);
+    if (!user || !user.name) return;
+
+    // 1. Replace login text links with Member Profile Badge
+    const authLinks = document.querySelectorAll('a[href="auth.html"], a[href="auth"]');
+    authLinks.forEach(link => {
+      if (link.textContent.trim() === "로그인") {
+        const container = document.createElement('div');
+        container.className = 'flex items-center gap-2 text-xs font-semibold';
+        container.innerHTML = `
+          <a href="dashboard.html" class="px-2.5 py-1 rounded-full bg-primary-fixed text-primary flex items-center gap-1 font-bold hover:bg-primary-fixed-dim transition-colors shadow-sm" title="${user.email}">
+            <span class="material-symbols-outlined text-[15px]">account_circle</span>
+            <span>${user.name} 님</span>
+          </a>
+          <button type="button" class="text-xs text-outline hover:text-error hover:underline cursor-pointer" onclick="handleGlobalLogout()">
+            로그아웃
+          </button>
+        `;
+        link.replaceWith(container);
+      } else if (link.querySelector('.material-symbols-outlined')?.textContent.trim() === "person") {
+        link.title = `${user.name} (${user.email}) - 대시보드 이동`;
+        link.href = 'dashboard.html';
+        link.classList.add('ring-2', 'ring-primary', 'ring-offset-1');
+      }
+    });
+
+    // 2. Change "비회원 진단" button to "내 진단 대시보드" in header
+    const guestLinks = document.querySelectorAll('header a');
+    guestLinks.forEach(a => {
+      if (a.textContent.includes('비회원 진단')) {
+        a.href = 'dashboard.html';
+        a.className = 'hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-primary bg-primary-fixed/60 hover:bg-primary-fixed rounded-lg transition-colors border border-primary/20 shadow-sm';
+        a.innerHTML = `
+          <span class="material-symbols-outlined text-[16px] text-primary">dashboard</span>
+          <span>내 진단 대시보드</span>
+        `;
+      }
+    });
+  } catch (e) {
+    console.error("Auth header sync error:", e);
+  }
+}
+
+/**
+ * Requirement 3: Personalized Hero Experience for Logged-in Members
+ * Replaces the static 김OO example with the user's personal profile & 1-click diagnosis.
+ */
+function renderPersonalizedHero() {
+  const container = document.getElementById('hero-persona-card-container');
+  if (!container) return;
+
+  const raw = localStorage.getItem('youthfit_user');
+  if (!raw) return; // Keep the default '김OO 님 (가상 예시)' card for guests
+
+  try {
+    const user = JSON.parse(raw);
+    if (!user || !user.name) return;
+
+    // Retrieve user's conditions (or default fallback)
+    const savedProf = localStorage.getItem('youthfit_member_profile');
+    const userProf = user.profile?.user_conditions || (savedProf ? JSON.parse(savedProf) : null);
+    
+    const profile = userProf || {
+      age: 24,
+      region: '서울',
+      regionFull: '서울특별시',
+      district: '관악구',
+      jobStatus: 'jobseeker',
+      household: 'single',
+      income: 'income60'
+    };
+
+    const jobMap = {
+      jobseeker: '취업준비생',
+      employed: '재직자(중소·스타트업)',
+      freelancer: '프리랜서·창업가',
+      student: '대학(원)생'
+    };
+    const householdMap = {
+      single: '1인 단독가구',
+      multi: '다인가구(동거)'
+    };
+    const incomeMap = {
+      income60: '기준 중위소득 60% 이하',
+      income120: '중위소득 60%~120%',
+      income150: '중위소득 120%~150%',
+      incomeOver: '중위소득 150% 초과'
+    };
+
+    const jobLabel = jobMap[profile.jobStatus] || '청년 구직자';
+    const houseLabel = householdMap[profile.household] || '1인 가구';
+    const regionLabel = `${profile.regionFull || profile.region || '서울'} ${profile.district || ''}`.trim();
+    const incomeLabel = incomeMap[profile.income] || '소득 60% 이하';
+
+    // Recent diagnosis summary
+    const recent = user.profile?.recent_diagnosis;
+    const hasRecent = !!recent;
+    const benefitAmountStr = hasRecent ? (recent.total_benefit_formatted || Number(recent.total_benefit || 3200000).toLocaleString('ko-KR')) : '3,200,000';
+    const matchCount = hasRecent ? (recent.matched_count || 4) : 4;
+
+    container.innerHTML = `
+      <div class="absolute -inset-1 rounded-3xl bg-gradient-to-r from-primary/30 to-secondary/30 opacity-60 blur-xl"></div>
+      <div class="relative flex flex-col rounded-3xl bg-surface-container-lowest p-space-lg shadow-xl border-2 border-primary/25">
+        
+        <!-- Member Header -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-space-sm">
+            <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-md font-extrabold text-lg">
+              ${user.name.charAt(0)}
+            </div>
+            <div>
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-base text-on-surface">${user.name} 님</span>
+                <span class="rounded-full bg-secondary-fixed/70 px-2 py-0.5 text-xs font-bold text-secondary flex items-center gap-0.5">
+                  <span class="material-symbols-outlined text-xs">verified</span> 정식회원
+                </span>
+              </div>
+              <p class="text-xs text-on-surface-variant">${user.email}</p>
+            </div>
+          </div>
+          <span class="rounded-full bg-primary-fixed/60 text-primary px-3 py-1 text-xs font-bold flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">auto_awesome</span> 맞춤 프로필
+          </span>
+        </div>
+
+        <!-- Saved Conditions Summary -->
+        <div class="mt-space-md rounded-2xl bg-surface-container-low p-3.5 border border-hairline-border space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-on-surface flex items-center gap-1">
+              <span class="material-symbols-outlined text-sm text-primary">person_pin</span>
+              <span>나의 등록 진단 조건</span>
+            </span>
+            <a href="diagnosis.html" class="text-xs text-primary font-semibold hover:underline flex items-center gap-0.5">
+              <span>조건 수정</span>
+              <span class="material-symbols-outlined text-xs">tune</span>
+            </a>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-hairline-border space-y-0.5">
+              <span class="text-outline text-[11px] block">연령 및 거주지</span>
+              <span class="font-bold text-on-surface truncate block">만 ${profile.age}세 · ${regionLabel}</span>
+            </div>
+            <div class="bg-surface-container-lowest p-2.5 rounded-xl border border-hairline-border space-y-0.5">
+              <span class="text-outline text-[11px] block">경제활동 및 가구</span>
+              <span class="font-bold text-on-surface truncate block">${jobLabel} · ${houseLabel}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Benefit Preview Box -->
+        <div class="mt-3 rounded-2xl bg-gradient-to-br from-primary-fixed/20 via-surface-container-low to-secondary-fixed/20 p-4 border border-primary/20">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-on-surface-variant">
+              ${hasRecent ? '최근 진단 수혜 분석 결과' : '2025 예상 청년 지원금'}
+            </span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-secondary-container px-2 py-0.5 text-xs font-bold text-on-secondary-container">
+              <span class="material-symbols-outlined text-[13px]">check_circle</span>
+              ${matchCount}건 적격 판별
+            </span>
+          </div>
+          <div class="mt-1 flex items-baseline gap-1.5">
+            <span class="text-sm font-semibold text-on-surface">연 약</span>
+            <span class="font-display text-3xl sm:text-4xl font-extrabold tracking-tight text-secondary">${benefitAmountStr}</span>
+            <span class="text-base font-bold text-on-surface">원</span>
+          </div>
+          <p class="mt-1 text-xs text-on-surface-variant">
+            ${regionLabel} 기준 청년 맞춤 복지·주거·일자리 지원금
+          </p>
+        </div>
+
+        <!-- 1-Click Rapid Diagnosis CTA Button -->
+        <div class="mt-space-md space-y-2">
+          <button id="btn-one-click" onclick="triggerOneClickDiagnosis()" class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold text-sm shadow-md hover:shadow-lg hover:brightness-105 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <span class="material-symbols-outlined text-xl text-secondary">bolt</span>
+            <span>내 조건으로 원클릭 즉시 진단</span>
+            <span class="material-symbols-outlined text-base">arrow_forward</span>
+          </button>
+          
+          <div class="flex items-center justify-between px-1 text-xs text-on-surface-variant pt-1">
+            <span class="flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px] text-secondary">flash_on</span>
+              <span>재설문 없이 0.5초 즉시 매칭</span>
+            </span>
+            <a href="diagnosis.html" class="text-primary hover:underline font-semibold flex items-center gap-0.5">
+              <span>조건 변경 진단</span>
+              <span class="material-symbols-outlined text-xs">edit_note</span>
+            </a>
+          </div>
+        </div>
+
+        ${hasRecent ? `
+          <div class="mt-3 pt-2.5 border-t border-hairline-border flex items-center justify-between text-xs">
+            <span class="text-outline">최근 진단일: ${recent.date || '최근'}</span>
+            <a href="dashboard.html" class="font-bold text-primary hover:underline flex items-center gap-0.5">
+              <span>결과 보관함 바로가기</span>
+              <span class="material-symbols-outlined text-xs">arrow_outward</span>
+            </a>
+          </div>
+        ` : ''}
+
+      </div>
+    `;
+  } catch (e) {
+    console.error("Personalized hero render failed:", e);
+  }
+}
+
+/**
+ * 1-Click Rapid Diagnosis for Logged-in Members
+ */
+async function triggerOneClickDiagnosis() {
+  const btn = document.getElementById('btn-one-click');
+  const originalHtml = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `
+      <span class="material-symbols-outlined text-lg animate-spin">progress_activity</span>
+      <span>AI 706건 정책 실시간 매칭 중...</span>
+    `;
+  }
+
+  try {
+    const raw = localStorage.getItem('youthfit_user');
+    const user = raw ? JSON.parse(raw) : null;
+    
+    // Retrieve member profile
+    const savedProf = localStorage.getItem('youthfit_member_profile');
+    const profile = (user && user.profile?.user_conditions) || (savedProf ? JSON.parse(savedProf) : {
+      age: 24,
+      region: '서울',
+      regionFull: '서울특별시',
+      district: '관악구',
+      jobStatus: 'jobseeker',
+      household: 'single',
+      income: 'income60'
+    });
+
+    // Run Diagnosis API
+    const res = await fetch('/api/diagnose', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(profile)
+    });
+
+    const json = await res.json();
+    if (!res.ok || json.status !== 'success') {
+      throw new Error(json.detail || '진단 연산에 실패했습니다.');
+    }
+
+    const diagData = json.data;
+    localStorage.setItem('youthfit_diagnosis_result', JSON.stringify(diagData));
+    localStorage.setItem('youthfit_member_profile', JSON.stringify(profile));
+
+    // Persist to user DB if user exists
+    if (user && user.id) {
+      fetch('/api/user/save-diagnosis', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.id,
+          profile: profile,
+          diagnosis_result: diagData
+        })
+      }).catch(e => console.warn("DB save sync error:", e));
+
+      // Also update local user object
+      user.profile = user.profile || {};
+      user.profile.user_conditions = profile;
+      user.profile.recent_diagnosis = {
+        date: new Date().toISOString().slice(0, 19).replace('T', ' '),
+        profile: profile,
+        total_benefit: diagData.total_benefit,
+        total_benefit_formatted: diagData.total_benefit_formatted,
+        matched_count: diagData.matched_count
+      };
+      localStorage.setItem('youthfit_user', JSON.stringify(user));
+    }
+
+    if (window.showToast) {
+      window.showToast('✓ 맞춤 진단 완료! 대시보드로 이동합니다.', 'success');
+    }
+
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 400);
+
+  } catch (err) {
+    alert("원클릭 진단 오류: " + err.message);
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+    }
+  }
+}
+
+function handleGlobalLogout() {
+  localStorage.removeItem('youthfit_user');
+  localStorage.removeItem('youthfit_member_profile');
+  localStorage.removeItem('youthfit_diagnosis_result');
+  localStorage.removeItem('youthfit_profile');
+  sessionStorage.clear();
+
+  if (window.showToast) {
+    window.showToast('성공적으로 로그아웃되었습니다.', 'info');
+  } else {
+    alert('로그아웃되었습니다.');
+  }
+  setTimeout(() => {
+    window.location.reload();
+  }, 500);
+}
+
+window.triggerOneClickDiagnosis = triggerOneClickDiagnosis;
+window.handleGlobalLogout = handleGlobalLogout;
+
+document.addEventListener('DOMContentLoaded', () => {
+  updateGlobalAuthHeader();
+  renderPersonalizedHero();
+});
+
+
