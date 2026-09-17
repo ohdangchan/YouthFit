@@ -19,36 +19,38 @@
       theme: {
         extend: {
           colors: {
-            "surface": "#f8f9ff",
-            "surface-dim": "#cbdbf5",
-            "surface-bright": "#f8f9ff",
-            "surface-container-lowest": "#ffffff",
-            "surface-container-low": "#eff4ff",
-            "surface-container": "#e5eeff",
-            "surface-container-high": "#dce9ff",
-            "surface-container-highest": "#d3e4fe",
-            "on-surface": "#0b1c30",
-            "on-surface-variant": "#434655",
-            "inverse-surface": "#213145",
-            "inverse-on-surface": "#eaf1ff",
-            "outline": "#737686",
-            "outline-variant": "#c3c6d7",
-            "primary": "#004ac6",
-            "primary-container": "#2563eb",
-            "on-primary": "#ffffff",
-            "on-primary-container": "#eeefff",
-            "primary-fixed": "#dbe1ff",
-            "primary-fixed-dim": "#b4c5ff",
-            "secondary": "#006c4a",
-            "secondary-container": "#82f5c1",
-            "on-secondary": "#ffffff",
-            "on-secondary-container": "#00714e",
-            "secondary-fixed": "#85f8c4",
-            "secondary-fixed-dim": "#68dba9",
-            "tertiary": "#006242",
-            "tertiary-container": "#007d55",
-            "error": "#ba1a1a",
-            "error-container": "#ffdad6"
+            "surface": "var(--surface)",
+            "surface-dim": "var(--surface-dim)",
+            "surface-bright": "var(--surface-bright)",
+            "surface-container-lowest": "var(--surface-container-lowest)",
+            "surface-container-low": "var(--surface-container-low)",
+            "surface-container": "var(--surface-container)",
+            "surface-container-high": "var(--surface-container-high)",
+            "surface-container-highest": "var(--surface-container-highest)",
+            "on-surface": "var(--on-surface)",
+            "on-surface-variant": "var(--on-surface-variant)",
+            "inverse-surface": "var(--inverse-surface)",
+            "inverse-on-surface": "var(--inverse-on-surface)",
+            "outline": "var(--outline)",
+            "outline-variant": "var(--outline-variant)",
+            "primary": "var(--primary)",
+            "primary-container": "var(--primary-container)",
+            "on-primary": "var(--on-primary)",
+            "on-primary-container": "var(--on-primary-container)",
+            "primary-fixed": "var(--primary-fixed)",
+            "primary-fixed-dim": "var(--primary-fixed-dim)",
+            "secondary": "var(--secondary)",
+            "secondary-container": "var(--secondary-container)",
+            "on-secondary": "var(--on-secondary)",
+            "on-secondary-container": "var(--on-secondary-container)",
+            "secondary-fixed": "var(--secondary-fixed)",
+            "secondary-fixed-dim": "var(--secondary-fixed-dim)",
+            "tertiary": "var(--tertiary)",
+            "tertiary-container": "var(--tertiary-container)",
+            "error": "var(--error)",
+            "error-container": "var(--error-container)",
+            "hairline-border": "var(--hairline-border)",
+            "hairline-hover": "var(--hairline-hover)"
           },
           spacing: {
             "space-xs": "0.25rem",
@@ -71,7 +73,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="bg-surface font-body text-on-surface antialiased">
+<body class="bg-surface ambient-gradient-canvas font-body text-on-surface antialiased">
   
   <!-- Header Bar -->
   <header class="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-hairline-border">
@@ -86,6 +88,9 @@
       </div>
 
       <div class="flex items-center gap-space-sm">
+        <button class="theme-toggle-btn w-9 h-9 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center justify-center transition-colors border border-hairline-border cursor-pointer shadow-sm" onclick="toggleTheme()" type="button" title="테마 변경 (다크/라이트)">
+          <span class="material-symbols-outlined text-[20px] theme-icon text-primary">dark_mode</span>
+        </button>
         <a class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container text-xs font-semibold text-primary hover:bg-surface-container-high transition-colors" href="dashboard.html">
           <span>대시보드로 건너뛰기</span>
           <span class="material-symbols-outlined text-[16px]">fast_forward</span>
@@ -95,8 +100,8 @@
   </header>
 
   <!-- Processing Viewport -->
-  <main class="w-full pt-16 bg-surface min-h-screen flex items-center justify-center">
-    <div class="relative w-full overflow-hidden bg-surface py-12 lg:py-16 px-4 sm:px-6 lg:px-12 flex flex-col items-center justify-center">
+  <main class="w-full pt-16 min-h-screen flex items-center justify-center">
+    <div class="relative w-full overflow-hidden py-12 lg:py-16 px-4 sm:px-6 lg:px-12 flex flex-col items-center justify-center">
       
       <!-- Ambient Depth Accents -->
       <div class="absolute -top-24 left-1/2 -translate-x-1/2 w-[620px] h-[360px] bg-gradient-to-b from-primary-fixed/40 via-surface-container-high/30 to-transparent blur-3xl pointer-events-none rounded-full"></div>
@@ -293,7 +298,11 @@
 
       </div>
     </div>
-  </main>
+  <!-- Floating Quick Theme Switcher -->
+  <button class="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-3.5 py-2 rounded-full bg-surface-container-lowest/90 hover:bg-surface-container text-on-surface shadow-lg border border-hairline-border backdrop-blur-md transition-all active:scale-95 cursor-pointer text-xs font-bold" onclick="toggleTheme()" type="button" title="테마 변경 (다크/라이트)">
+    <span class="material-symbols-outlined text-[18px] theme-icon text-primary">dark_mode</span>
+    <span class="theme-toggle-label">다크 모드</span>
+  </button>
 
   <!-- Scripts -->
   <script src="js/app.js"></script>
