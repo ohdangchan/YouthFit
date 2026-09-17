@@ -192,7 +192,7 @@
             <!-- TAB 1: LOGIN PANE -->
             <div class="space-y-6" id="pane-login">
               <!-- Google Action -->
-              <button class="w-full flex items-center justify-center space-x-3 py-3 px-4 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface transition-colors cursor-pointer shadow-sm border border-hairline-border text-sm font-bold" onclick="showToast('Google 연동 인증 모달이 호출되었습니다.', 'info')" type="button">
+              <button class="w-full flex items-center justify-center space-x-3 py-3.5 px-4 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface transition-colors cursor-pointer shadow-sm border border-hairline-border text-sm font-bold" id="btn-google-login" onclick="handleGoogleLogin()" type="button">
                 <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
@@ -214,7 +214,7 @@
                   <label class="block text-xs font-bold text-on-surface" for="login-email">이메일 계정</label>
                   <div class="relative">
                     <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-xl pointer-events-none">mail</span>
-                    <input class="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm shadow-sm outline-none border border-hairline-border focus:border-primary" id="login-email" placeholder="example@youthfit.kr" required type="email" value="minwoo@youthfit.kr">
+                    <input class="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm shadow-sm outline-none border border-hairline-border focus:border-primary" id="login-email" placeholder="example@youthfit.kr" required type="email">
                   </div>
                 </div>
 
@@ -225,7 +225,7 @@
                   </div>
                   <div class="relative">
                     <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-xl pointer-events-none">lock</span>
-                    <input class="w-full pl-11 pr-11 py-3 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm shadow-sm outline-none border border-hairline-border focus:border-primary" id="login-password" placeholder="8자 이상 비밀번호" required type="password" value="password1234!">
+                    <input class="w-full pl-11 pr-11 py-3 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm shadow-sm outline-none border border-hairline-border focus:border-primary" id="login-password" placeholder="8자 이상 비밀번호" required type="password">
                     <button class="absolute right-3.5 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface cursor-pointer p-1" onclick="togglePasswordVisibility('login-password', this)" type="button">
                       <span class="material-symbols-outlined text-xl">visibility</span>
                     </button>
@@ -286,14 +286,14 @@
                   <div class="space-y-1.5 pl-6 pt-1">
                     <label class="flex items-center justify-between text-on-surface-variant text-xs cursor-pointer">
                       <span class="flex items-center space-x-2">
-                        <input checked class="agree-sub w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" required type="checkbox">
+                        <input class="agree-sub w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" required type="checkbox">
                         <span>(필수) 청년정책 진단 서비스 이용약관</span>
                       </span>
                       <span class="text-outline underline text-[11px]">전문</span>
                     </label>
                     <label class="flex items-center justify-between text-on-surface-variant text-xs cursor-pointer">
                       <span class="flex items-center space-x-2">
-                        <input checked class="agree-sub w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" required type="checkbox">
+                        <input class="agree-sub w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" required type="checkbox">
                         <span>(필수) 공공 마이데이터 및 개인정보 수집 이용 동의</span>
                       </span>
                       <span class="text-outline underline text-[11px]">전문</span>

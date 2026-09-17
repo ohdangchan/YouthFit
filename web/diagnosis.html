@@ -106,6 +106,9 @@
   <main class="w-full pt-20 pb-16 min-h-screen px-4 sm:px-6">
     <div class="max-w-5xl mx-auto flex flex-col py-4">
       
+      <!-- User Mode Banner (Member vs One-time Guest) -->
+      <div id="diagnosis-user-banner" class="mb-4"></div>
+
       <!-- Top Title & Progress Bar -->
       <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
         <div class="flex flex-col max-w-2xl">
@@ -164,25 +167,79 @@
             </div>
           </section>
 
-          <!-- Question 2: 거주지 선택 -->
-          <section class="p-6 rounded-xl bg-surface-container-lowest shadow-sm border border-hairline-border">
-            <div class="flex items-center justify-between mb-4">
+          <!-- Question 2: 전국 거주지 선택 -->
+          <section class="p-6 rounded-xl bg-surface-container-lowest shadow-sm border border-hairline-border" id="section-region-select">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
               <div class="flex items-center gap-2">
                 <span class="w-6 h-6 rounded-full bg-surface-container-high text-primary text-xs flex items-center justify-center font-bold">02</span>
-                <h2 class="text-base sm:text-lg font-bold text-on-surface">현재 거주하는 지역구는 어디인가요?</h2>
+                <h2 class="text-base sm:text-lg font-bold text-on-surface">현재 거주하는 지역은 어디인가요?</h2>
               </div>
-              <span class="text-xs text-secondary font-semibold">자치구 특화 혜택 연동</span>
+              <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary-fixed text-primary text-xs font-bold" id="current-region-badge">
+                <span class="material-symbols-outlined text-[14px]">location_on</span>
+                <span id="current-region-text">서울특별시 관악구</span>
+              </div>
             </div>
-            <p class="text-xs text-on-surface-variant mb-4">구별 추가 지원금(청년수당 가점, 월세 지원 우선배정) 판별에 활용됩니다.</p>
-            <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="district-selector">
-              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-primary-container text-on-primary shadow-sm font-semibold flex items-center justify-center gap-1" type="button">
-                <span class="material-symbols-outlined text-xs">check</span> 관악구
-              </button>
-              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" type="button">마포구</button>
-              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" type="button">강남구</button>
-              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" type="button">성동구</button>
-              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" type="button">영등포구</button>
-              <button class="py-2.5 px-3 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" type="button">기타 20개 구 ▾</button>
+            <p class="text-xs text-on-surface-variant mb-4">전국 17개 시·도 및 지자체별 특화 지원금(청년수당, 월세 지원, 청년통장) 매칭에 반영됩니다.</p>
+            
+            <!-- Step 2-1: 시·도 (17개 광역시·도) 선택 -->
+            <div class="space-y-2 mb-4">
+              <div class="flex items-center justify-between text-xs text-on-surface font-semibold">
+                <span>1단계: 시·도 선택</span>
+                <button type="button" class="text-primary hover:underline text-xs flex items-center gap-0.5" id="btn-toggle-all-provinces">
+                  <span id="province-toggle-label">전체 17개 시·도 보기</span> ▾
+                </button>
+              </div>
+
+              <!-- Main Popular Provinces (6) -->
+              <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="province-main-group">
+                <button type="button" class="province-btn py-2.5 px-2 rounded-lg text-xs sm:text-sm text-center font-bold transition-all bg-primary text-on-primary shadow-sm flex items-center justify-center gap-1" data-province="서울" data-full="서울특별시">
+                  <span class="material-symbols-outlined text-xs">check</span> 서울
+                </button>
+                <button type="button" class="province-btn py-2.5 px-2 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" data-province="경기" data-full="경기도">
+                  경기
+                </button>
+                <button type="button" class="province-btn py-2.5 px-2 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" data-province="인천" data-full="인천광역시">
+                  인천
+                </button>
+                <button type="button" class="province-btn py-2.5 px-2 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" data-province="부산" data-full="부산광역시">
+                  부산
+                </button>
+                <button type="button" class="province-btn py-2.5 px-2 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" data-province="대구" data-full="대구광역시">
+                  대구
+                </button>
+                <button type="button" class="province-btn py-2.5 px-2 rounded-lg text-xs sm:text-sm text-center transition-all bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high" data-province="광주" data-full="광주광역시">
+                  광주
+                </button>
+              </div>
+
+              <!-- Collapsible 17 Provinces Panel -->
+              <div class="hidden p-3.5 rounded-xl bg-surface-container-low border border-hairline-border" id="province-all-panel">
+                <div class="grid grid-cols-4 sm:grid-cols-6 gap-1.5">
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="대전" data-full="대전광역시">대전</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="울산" data-full="울산광역시">울산</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="세종" data-full="세종특별자치시">세종</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="강원" data-full="강원특별자치도">강원</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="충북" data-full="충청북도">충북</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="충남" data-full="충청남도">충남</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="전북" data-full="전북특별자치도">전북</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="전남" data-full="전라남도">전남</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="경북" data-full="경상북도">경북</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="경남" data-full="경상남도">경남</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant" data-province="제주" data-full="제주특별자치도">제주</button>
+                  <button type="button" class="sub-province-btn px-2 py-1.5 rounded-lg text-xs text-center bg-surface-container-lowest hover:bg-primary-fixed text-on-surface-variant font-bold text-primary" data-province="전국" data-full="전국 공통">전국(공통)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2-2: 시·군·구 / 자치구 선택 -->
+            <div class="space-y-2 pt-2 border-t border-hairline-border">
+              <div class="flex items-center justify-between text-xs text-on-surface font-semibold">
+                <span id="district-step-title">2단계: 서울특별시 세부 자치구 선택</span>
+                <span class="text-[11px] text-outline">지역 특화 가산점이 적용됩니다</span>
+              </div>
+              <div class="grid grid-cols-3 sm:grid-cols-6 gap-2" id="district-chips-container">
+                <!-- Dynamically populated based on chosen province -->
+              </div>
             </div>
           </section>
 
