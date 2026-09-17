@@ -19,36 +19,38 @@
       theme: {
         extend: {
           colors: {
-            "surface": "#f8f9ff",
-            "surface-dim": "#cbdbf5",
-            "surface-bright": "#f8f9ff",
-            "surface-container-lowest": "#ffffff",
-            "surface-container-low": "#eff4ff",
-            "surface-container": "#e5eeff",
-            "surface-container-high": "#dce9ff",
-            "surface-container-highest": "#d3e4fe",
-            "on-surface": "#0b1c30",
-            "on-surface-variant": "#434655",
-            "inverse-surface": "#213145",
-            "inverse-on-surface": "#eaf1ff",
-            "outline": "#737686",
-            "outline-variant": "#c3c6d7",
-            "primary": "#004ac6",
-            "primary-container": "#2563eb",
-            "on-primary": "#ffffff",
-            "on-primary-container": "#eeefff",
-            "primary-fixed": "#dbe1ff",
-            "primary-fixed-dim": "#b4c5ff",
-            "secondary": "#006c4a",
-            "secondary-container": "#82f5c1",
-            "on-secondary": "#ffffff",
-            "on-secondary-container": "#00714e",
-            "secondary-fixed": "#85f8c4",
-            "secondary-fixed-dim": "#68dba9",
-            "tertiary": "#006242",
-            "tertiary-container": "#007d55",
-            "error": "#ba1a1a",
-            "error-container": "#ffdad6"
+            "surface": "var(--surface)",
+            "surface-dim": "var(--surface-dim)",
+            "surface-bright": "var(--surface-bright)",
+            "surface-container-lowest": "var(--surface-container-lowest)",
+            "surface-container-low": "var(--surface-container-low)",
+            "surface-container": "var(--surface-container)",
+            "surface-container-high": "var(--surface-container-high)",
+            "surface-container-highest": "var(--surface-container-highest)",
+            "on-surface": "var(--on-surface)",
+            "on-surface-variant": "var(--on-surface-variant)",
+            "inverse-surface": "var(--inverse-surface)",
+            "inverse-on-surface": "var(--inverse-on-surface)",
+            "outline": "var(--outline)",
+            "outline-variant": "var(--outline-variant)",
+            "primary": "var(--primary)",
+            "primary-container": "var(--primary-container)",
+            "on-primary": "var(--on-primary)",
+            "on-primary-container": "var(--on-primary-container)",
+            "primary-fixed": "var(--primary-fixed)",
+            "primary-fixed-dim": "var(--primary-fixed-dim)",
+            "secondary": "var(--secondary)",
+            "secondary-container": "var(--secondary-container)",
+            "on-secondary": "var(--on-secondary)",
+            "on-secondary-container": "var(--on-secondary-container)",
+            "secondary-fixed": "var(--secondary-fixed)",
+            "secondary-fixed-dim": "var(--secondary-fixed-dim)",
+            "tertiary": "var(--tertiary)",
+            "tertiary-container": "var(--tertiary-container)",
+            "error": "var(--error)",
+            "error-container": "var(--error-container)",
+            "hairline-border": "var(--hairline-border)",
+            "hairline-hover": "var(--hairline-hover)"
           },
           spacing: {
             "space-xs": "0.25rem",
@@ -71,7 +73,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body class="bg-surface font-body text-on-surface antialiased min-h-screen flex items-center justify-center p-4 md:p-8">
+<body class="bg-surface auth-ambient-mesh font-body text-on-surface antialiased min-h-screen flex items-center justify-center p-4 md:p-8">
   
   <main class="w-full max-w-6xl mx-auto py-6">
     <div class="relative w-full">
@@ -83,7 +85,7 @@
       <div class="relative grid grid-cols-1 lg:grid-cols-12 rounded-3xl bg-surface-container-lowest shadow-xl overflow-hidden border border-hairline-border">
         
         <!-- Left Column: Civic Editorial & Metric Spotlight (5 cols) -->
-        <div class="lg:col-span-5 bg-surface-container-low p-6 sm:p-8 lg:p-10 flex flex-col justify-between relative overflow-hidden border-b lg:border-b-0 lg:border-r border-hairline-border">
+        <div class="lg:col-span-5 auth-editorial-gradient p-6 sm:p-8 lg:p-10 flex flex-col justify-between relative overflow-hidden border-b lg:border-b-0 lg:border-r border-hairline-border">
           <div class="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-surface-variant/40 blur-2xl pointer-events-none"></div>
 
           <div class="flex flex-col space-y-6 relative z-10">
@@ -166,24 +168,31 @@
         <!-- Right Column: Interactive Authentication Forms (7 cols) -->
         <div class="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between bg-surface-container-lowest">
           <div>
-            <!-- Tab Navigation -->
-            <div class="flex p-1 bg-surface-container-low rounded-xl w-full max-w-md mb-6 border border-hairline-border" id="auth-tab-bar">
-              <button class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-bold text-center transition-all bg-surface-container-lowest text-primary shadow-sm cursor-pointer" id="tab-login" onclick="switchAuthTab('login')" type="button">
-                로그인
-              </button>
-              <button class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-bold text-center transition-all text-on-surface-variant hover:text-on-surface cursor-pointer" id="tab-signup" onclick="switchAuthTab('signup')" type="button">
-                간편 회원가입
-              </button>
-              <button class="flex-1 py-2 px-2.5 rounded-lg text-xs sm:text-sm font-bold text-center transition-all text-on-surface-variant hover:text-on-surface cursor-pointer inline-flex items-center justify-center space-x-1" id="tab-guest" onclick="switchAuthTab('guest')" type="button">
-                <span>비회원 빠른 진단</span>
-                <span class="px-1.5 py-0.5 rounded-full bg-secondary-fixed/50 text-secondary font-bold text-[10px] leading-tight shrink-0">1분</span>
+            <!-- Tab Navigation & Theme Button Container -->
+            <div class="flex items-center justify-between gap-3 mb-6">
+              <div class="flex p-1 bg-surface-container-low rounded-xl flex-1 max-w-md border border-hairline-border" id="auth-tab-bar">
+                <button class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-bold text-center transition-all bg-surface-container-lowest text-primary shadow-sm cursor-pointer" id="tab-login" onclick="switchAuthTab('login')" type="button">
+                  로그인
+                </button>
+                <button class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-bold text-center transition-all text-on-surface-variant hover:text-on-surface cursor-pointer" id="tab-signup" onclick="switchAuthTab('signup')" type="button">
+                  간편 회원가입
+                </button>
+                <button class="flex-1 py-2 px-2.5 rounded-lg text-xs sm:text-sm font-bold text-center transition-all text-on-surface-variant hover:text-on-surface cursor-pointer inline-flex items-center justify-center space-x-1" id="tab-guest" onclick="switchAuthTab('guest')" type="button">
+                  <span>비회원 빠른 진단</span>
+                  <span class="px-1.5 py-0.5 rounded-full bg-secondary-fixed/50 text-secondary font-bold text-[10px] leading-tight shrink-0">1분</span>
+                </button>
+              </div>
+
+              <!-- Theme Toggle Button -->
+              <button class="theme-toggle-btn w-10 h-10 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center justify-center transition-colors border border-hairline-border cursor-pointer shadow-sm shrink-0" onclick="toggleTheme()" type="button" title="테마 변경 (다크/라이트)">
+                <span class="material-symbols-outlined text-[20px] theme-icon text-primary">dark_mode</span>
               </button>
             </div>
 
             <!-- TAB 1: LOGIN PANE -->
             <div class="space-y-6" id="pane-login">
               <!-- Google Action -->
-              <button class="w-full flex items-center justify-center space-x-3 py-3 px-4 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface transition-colors cursor-pointer shadow-sm border border-hairline-border text-sm font-bold" onclick="showToast('Google 연동 인증 모달이 호출되었습니다.', 'info')" type="button">
+              <button class="w-full flex items-center justify-center space-x-3 py-3.5 px-4 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface transition-colors cursor-pointer shadow-sm border border-hairline-border text-sm font-bold" id="btn-google-login" onclick="handleGoogleLogin()" type="button">
                 <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
@@ -205,7 +214,7 @@
                   <label class="block text-xs font-bold text-on-surface" for="login-email">이메일 계정</label>
                   <div class="relative">
                     <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-xl pointer-events-none">mail</span>
-                    <input class="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm shadow-sm outline-none border border-hairline-border focus:border-primary" id="login-email" placeholder="example@youthfit.kr" required type="email" value="minwoo@youthfit.kr">
+                    <input class="w-full pl-11 pr-4 py-3 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm shadow-sm outline-none border border-hairline-border focus:border-primary" id="login-email" placeholder="example@youthfit.kr" required type="email">
                   </div>
                 </div>
 
@@ -216,7 +225,7 @@
                   </div>
                   <div class="relative">
                     <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-xl pointer-events-none">lock</span>
-                    <input class="w-full pl-11 pr-11 py-3 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm shadow-sm outline-none border border-hairline-border focus:border-primary" id="login-password" placeholder="8자 이상 비밀번호" required type="password" value="password1234!">
+                    <input class="w-full pl-11 pr-11 py-3 rounded-xl bg-surface-container-lowest text-on-surface placeholder:text-outline text-sm shadow-sm outline-none border border-hairline-border focus:border-primary" id="login-password" placeholder="8자 이상 비밀번호" required type="password">
                     <button class="absolute right-3.5 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface cursor-pointer p-1" onclick="togglePasswordVisibility('login-password', this)" type="button">
                       <span class="material-symbols-outlined text-xl">visibility</span>
                     </button>
@@ -277,14 +286,14 @@
                   <div class="space-y-1.5 pl-6 pt-1">
                     <label class="flex items-center justify-between text-on-surface-variant text-xs cursor-pointer">
                       <span class="flex items-center space-x-2">
-                        <input checked class="agree-sub w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" required type="checkbox">
+                        <input class="agree-sub w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" required type="checkbox">
                         <span>(필수) 청년정책 진단 서비스 이용약관</span>
                       </span>
                       <span class="text-outline underline text-[11px]">전문</span>
                     </label>
                     <label class="flex items-center justify-between text-on-surface-variant text-xs cursor-pointer">
                       <span class="flex items-center space-x-2">
-                        <input checked class="agree-sub w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" required type="checkbox">
+                        <input class="agree-sub w-3.5 h-3.5 rounded text-primary accent-primary cursor-pointer" required type="checkbox">
                         <span>(필수) 공공 마이데이터 및 개인정보 수집 이용 동의</span>
                       </span>
                       <span class="text-outline underline text-[11px]">전문</span>
@@ -381,7 +390,11 @@
       </div>
 
     </div>
-  </main>
+  <!-- Floating Quick Theme Switcher -->
+  <button class="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-3.5 py-2 rounded-full bg-surface-container-lowest/90 hover:bg-surface-container text-on-surface shadow-lg border border-hairline-border backdrop-blur-md transition-all active:scale-95 cursor-pointer text-xs font-bold" onclick="toggleTheme()" type="button" title="테마 변경 (다크/라이트)">
+    <span class="material-symbols-outlined text-[18px] theme-icon text-primary">dark_mode</span>
+    <span class="theme-toggle-label">다크 모드</span>
+  </button>
 
   <!-- Scripts -->
   <script src="js/app.js"></script>
