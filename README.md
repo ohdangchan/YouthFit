@@ -271,20 +271,32 @@ venv\Scripts\activate      # Windows
 # source venv/bin/activate  # Mac/Linux
 
 # 필수 패키지 설치
-pip install fastapi uvicorn requests pydantic python-dotenv
+pip install -r requirements.txt
 ```
 
 ### 2. 환경 변수 설정 (`.env`)
-프로젝트 루트 디렉토리에 `.env` 파일을 생성하거나 환경변수를 등록합니다:
+프로젝트 루트 디렉토리에 `.env` 파일을 생성하거나 `.env.example`을 복사하여 환경변수를 등록합니다:
 ```env
 # Gemini AI API Key (필수)
 GEMINI_API_KEY=your_gemini_api_key_here
 
 # 온통청년 Open API Key (선택: 미입력 시 내장 policies.json 고도화 DB 자동 활성화)
 ONTONG_API_KEY=your_youthcenter_openapi_key_here
+
+# PostgreSQL Database URL
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/youthfit
 ```
 
-### 3. 로컬 개발 서버 실행
+### 3. PostgreSQL 데이터베이스 초기화 및 마이그레이션
+```bash
+# PostgreSQL로 423건 청년 정책 데이터 원클릭 마이그레이션
+python scripts/migrate_sqlite_to_pg.py
+
+# 또는 온통청년 API에서 최신 정책 실시간 동기화
+python scripts/sync_policies_db.py
+```
+
+### 4. 로컬 개발 서버 실행
 ```bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
