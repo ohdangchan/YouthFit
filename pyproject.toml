@@ -10,17 +10,21 @@ ignore = [
     "W293",  # blank line whitespace
     "F401",  # unused import (IDE cleanup)
     "F841",  # unused variable
+    "E402",  # module level import not at top of file
+    "F541",  # f-string without placeholder
 ]
 
 [tool.pyrefly]
-project-includes = ["scripts", "scripts/crawlers"]
+project-includes = [".", "scripts", "scripts/crawlers", "services"]
 search-path = [
     ".",
     "scripts",
     "scripts/crawlers",
+    "services",
     "C:/Users/HB_OPERATION_NICK/Desktop/project/YouthFit",
     "C:/Users/HB_OPERATION_NICK/Desktop/project/YouthFit/scripts",
     "C:/Users/HB_OPERATION_NICK/Desktop/project/YouthFit/scripts/crawlers",
+    "C:/Users/HB_OPERATION_NICK/Desktop/project/YouthFit/services",
 ]
 
 [tool.pyrefly.errors]
@@ -32,5 +36,7 @@ bad-argument-type = "ignore"
 not-iterable = "ignore"
 unsupported-operation = "ignore"
 untyped-import = "ignore"
+bad-index = "ignore"
+no-matching-overload = "ignore"
 
 

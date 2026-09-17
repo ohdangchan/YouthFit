@@ -1,5 +1,9 @@
 import sys
-sys.stdout.reconfigure(encoding='utf-8')
+from contextlib import suppress
+
+if hasattr(sys.stdout, "reconfigure"):
+    with suppress(AttributeError, OSError):
+        getattr(sys.stdout, "reconfigure")(encoding="utf-8")
 sys.path.insert(0, '.')
 from services import diagnosis_engine
 
