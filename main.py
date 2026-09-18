@@ -66,6 +66,11 @@ async def serve_dashboard():
 async def serve_auth():
     return FileResponse(os.path.join(web_dir, "auth.html"))
 
+@app.get("/promo")
+@app.get("/promo.html")
+async def serve_promo():
+    return FileResponse(os.path.join(web_dir, "promo.html"))
+
 # 3. REST API 정의
 class DiagnosisRequest(BaseModel):
     age: int = 24
